@@ -30,11 +30,24 @@ class SimpleRobot:
             forces=[10] * len(self.wheel_indices)
         )
 
+    def _post_move(self):
+        self._turn_off_motors()
+        self.sim.sleep(0.5)
+        # Update image in GUI
+        self.sensors.get_rgb_image()
+        self.sensors.visualize_lidar()
+
     def show_camera_image(self):
         self.sensors.show_image()
     
     def get_rgb_image(self):
         return self.sensors.get_rgb_image()
+
+    def get_lidar_scan(self):
+        return self.sensors.get_lidar_scan()
+
+    def visualize_lidar(self):
+        self.sensors.visualize_lidar()
         
     def move_forward(self, distance):
         """
@@ -56,10 +69,7 @@ class SimpleRobot:
 
         # Run the simulation for a bit to move the robot
         self.sim.sleep(distance / (target_velocity * 0.1))
-        self._turn_off_motors()
-        self.sim.sleep(0.5)
-        # Update image in GUI
-        self.sensors.get_rgb_image()
+        self._post_move()
 
     def turn(self, angle_degrees):
         """
@@ -76,8 +86,7 @@ class SimpleRobot:
             velocity_mask = [1, 1, -1, -1]
 
         target_angle = (self.sensors.get_direction_facing() + angle_degrees) % 360
-        deviation = target_angle - self.sensors.get_direction_facing()
-        assert(deviation == angle_degrees)
+        deviation = round(target_angle - self.sensors.get_direction_facing(), 1)
 
         # Apply velocity control to all wheels simultaneously
         p.setJointMotorControlArray(
@@ -88,13 +97,20 @@ class SimpleRobot:
             forces=[force] * len(self.wheel_indices)
         )
 
-        while abs(deviation) > 0.5:
+        while abs(deviation) > 1:
             p.stepSimulation()
             time.sleep(self.time_step)
             deviation = target_angle - self.sensors.get_direction_facing()
+            deviation = deviation % 360
 
-        self._turn_off_motors()
-        self.sim.sleep(0.5)
+            if abs(deviation) < 5:
+                # Slow down if close
+                p.setJointMotorControlArray(
+                    bodyUniqueId=self.id,
+                    jointIndices=self.wheel_indices,
+                    controlMode=p.VELOCITY_CONTROL,
+                    targetVelocities=[target_velocity * 0.125 * v for v in velocity_mask],
+                    forces=[force] * len(self.wheel_indices)
+                )
 
-        # Update image in GUI
-        self.sensors.get_rgb_image()
+        self._post_move()

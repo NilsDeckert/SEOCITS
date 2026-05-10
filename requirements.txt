@@ -1,4 +1,6 @@
-pybullet
+dotenv
 numpy
-scipy
+openai
 opencv-python
+pybullet
+scipy

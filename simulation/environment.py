@@ -30,9 +30,9 @@ class Simulation:
 
     def spawn_cube_at(self, position, color=red):
         # 1. Physical properties
-        col_box_id = p.createCollisionShape(p.GEOM_BOX, halfExtents=[0.5, 0.5, 0.5])
+        col_box_id = p.createCollisionShape(p.GEOM_BOX, halfExtents=[0.5, 0.5, 1])
         # 2. Appearance
-        vis_box_id = p.createVisualShape(p.GEOM_BOX, halfExtents=[0.5, 0.5, 0.5], rgbaColor=color)
+        vis_box_id = p.createVisualShape(p.GEOM_BOX, halfExtents=[0.5, 0.5, 1], rgbaColor=color)
         # 3. Create the body
         box_id = p.createMultiBody(
             baseMass=1.0,  # 0 makes it static (unmovable)

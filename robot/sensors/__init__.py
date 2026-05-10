@@ -27,6 +27,22 @@ class RobotSensors:
     def get_lidar_scan(self, num_rays=16, ray_length=5.0):
         return self.lidar.read(num_rays, ray_length)
 
+    def visualize_lidar(self):
+        rays = self.get_lidar_scan(num_rays=8)
+        f = [f"{x:.1f}" for x in rays]#
+        grid = [
+            [f[1], f[0], f[7]],
+            [f[2], "   ", f[6]],
+            [f[3], f[4], f[5]]
+        ]
+        
+        for row in grid:
+            print(f"{row[0]:>5} {row[1]:>5} {row[2]:>5}")
+        print("\n")
+
+    def get_distance_ahead(self):
+        return self.lidar.get_distance_ahead()
+
     def get_rgb_image(self):
         """
         Return numpy array of image.

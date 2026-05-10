@@ -17,8 +17,15 @@ class LidarSensor:
         :param num_rays: The number of rays to cast in a 360 degree circle.
         :param ray_length: The maximum distance the LiDAR can detect.
         :return: A list of distances for each ray. If no object is hit, the distance will be ray_length.
+
+        The distances are ordered counterclockwise starting from the front in read()[0]
         """
-        pos, orn = p.getBasePositionAndOrientation(self.robot_id)
+        pos, raw_orientation = p.getBasePositionAndOrientation(self.robot_id)
+
+        # Rotate 90 degrees so that the sensor points forward
+        correction_quat = p.getQuaternionFromEuler([0, 0, math.pi/2])
+        orn = p.multiplyTransforms([0,0,0], raw_orientation, [0,0,0], correction_quat)[1]
+
         euler = p.getEulerFromQuaternion(orn)
         yaw = euler[2]
 
@@ -26,7 +33,7 @@ class LidarSensor:
         ray_ends = []
         
         # Start rays slightly above the base z-coordinate
-        start_z = pos[2] + 0.1
+        start_z = pos[2] + 0.5
 
         for i in range(num_rays):
             angle = yaw + (i * 2.0 * math.pi / num_rays)
@@ -47,3 +54,9 @@ class LidarSensor:
             distances.append(hit_fraction * ray_length)
             
         return distances
+
+    def get_distance_ahead(self):
+        """
+        Return the distance to the obstacle in front of the robot.
+        """
+        return self.read(num_rays=1, ray_length=5.0)[0]

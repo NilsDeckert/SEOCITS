@@ -24,8 +24,10 @@ class RobotSensors:
     def get_velocity(self):
         return self.velocity.read()
 
-    def get_lidar_scan(self, num_rays=16, ray_length=5.0):
-        return self.lidar.read(num_rays, ray_length)
+    def get_lidar_scan(self, num_rays=8, ray_length=5.0):
+        raw = self.lidar.read(num_rays, ray_length)
+        rounded = [round(r, 1) for r in raw]
+        return rounded
 
     def visualize_lidar(self):
         rays = self.get_lidar_scan(num_rays=8)
@@ -49,3 +51,7 @@ class RobotSensors:
         This also shows the image in the GUI
         """
         return self.camera.get_rgb_image()
+
+    def get_base64_image(self):
+        """Return base64 string of image for LLM."""
+        return self.camera.get_base64_image()

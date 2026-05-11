@@ -35,13 +35,16 @@ class SimpleRobot:
         self.sim.sleep(0.5)
         # Update image in GUI
         self.sensors.get_rgb_image()
-        self.sensors.visualize_lidar()
+        # self.sensors.visualize_lidar()
 
     def show_camera_image(self):
         self.sensors.show_image()
     
     def get_rgb_image(self):
         return self.sensors.get_rgb_image()
+
+    def get_base64_image(self):
+        return self.sensors.get_base64_image()
 
     def get_lidar_scan(self):
         return self.sensors.get_lidar_scan()

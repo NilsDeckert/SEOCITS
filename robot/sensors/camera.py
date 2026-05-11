@@ -2,6 +2,7 @@ import cv2
 import pybullet as p
 import numpy as np
 import math
+import base64
 
 class Camera:
     def __init__(self, robot_id, width=320, height=320):
@@ -39,6 +40,14 @@ class Camera:
         )
         # Convert to numpy and drop alpha channel
         return np.reshape(rgb, (self.height, self.width, 4)) * 1. / 255.
+
+    def get_base64_image(self):
+        """Returns a base64 encoded PNG of the camera view."""
+        image = self.get_rgb_image()
+        image_uint8 = (image * 255).astype(np.uint8)
+        image_bgr = cv2.cvtColor(image_uint8, cv2.COLOR_RGBA2BGR)
+        _, buffer = cv2.imencode('.png', image_bgr)
+        return base64.b64encode(buffer).decode('utf-8')
 
     def show_image(self):
         image = self.get_rgb_image()

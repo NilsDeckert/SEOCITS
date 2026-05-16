@@ -1,6 +1,7 @@
-# PyBullet Exploration
+# Seminar: Operating Complex IT systems
 
-This is a minimal example demonstrating robot navigation using LLMs.
+The repository explores the usage of relative coordinates for a LLM controlled robot. 
+The idea is to provide a LLM with a simple api to control a robot, giving it tasks to complete in the environment.
 
 ## Usage
 

@@ -37,6 +37,12 @@ class SimpleRobot:
         self.sensors.get_rgb_image()
         # self.sensors.visualize_lidar()
 
+    def _get_direction_facing(self):
+        return self.sensors.get_direction_facing()
+
+    def _get_position(self):
+        return self.sensors.get_position()
+
     def show_camera_image(self):
         self.sensors.show_image()
     

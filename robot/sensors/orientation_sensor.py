@@ -14,7 +14,11 @@ class OrientationSensor:
         """
         Returns the [roll, pitch, yaw] orientation of the robot in radians.
         """
-        _, orn = p.getBasePositionAndOrientation(self.robot_id)
+        _, raw_orientation = p.getBasePositionAndOrientation(self.robot_id)
+
+        # Rotate 90 degrees so that the sensor points forward
+        correction_quat = p.getQuaternionFromEuler([0, 0, math.pi/2])
+        orn = p.multiplyTransforms([0,0,0], raw_orientation, [0,0,0], correction_quat)[1]
         return list(p.getEulerFromQuaternion(orn))
 
     def get_heading_deg(self):

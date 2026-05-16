@@ -1,8 +1,14 @@
+from robot import SimpleRobot
 import pybullet as p
 import pybullet_data
 import time
+from .object import Object
 
 class Simulation:
+    """
+    This class is a helper to keep track of objects and their state inside the simulation.
+    It also provides a utility function to progress the simulation forwards in time.
+    """
 
     red = [1, 0, 0, 1]
     blue = [0, 0, 1, 1]
@@ -17,6 +23,7 @@ class Simulation:
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.setGravity(0, 0, -9.81)
         self.planeId = p.loadURDF("plane.urdf")
+        self.bodies = []
         
     def sleep(self, seconds):
         """Idle the simulation for a set amount of time without freezing the GUI."""
@@ -26,13 +33,18 @@ class Simulation:
             time.sleep(1.0 / 240.0)
             
     def disconnect(self):
+        """
+        Exit
+        """
         p.disconnect()
 
     def spawn_cube_at(self, position, color=red):
+        half_extents = [0.5, 0.5, 1]
+
         # 1. Physical properties
-        col_box_id = p.createCollisionShape(p.GEOM_BOX, halfExtents=[0.5, 0.5, 1])
+        col_box_id = p.createCollisionShape(p.GEOM_BOX, halfExtents=half_extents)
         # 2. Appearance
-        vis_box_id = p.createVisualShape(p.GEOM_BOX, halfExtents=[0.5, 0.5, 1], rgbaColor=color)
+        vis_box_id = p.createVisualShape(p.GEOM_BOX, halfExtents=half_extents, rgbaColor=color)
         # 3. Create the body
         box_id = p.createMultiBody(
             baseMass=1.0,  # 0 makes it static (unmovable)
@@ -40,3 +52,24 @@ class Simulation:
             baseVisualShapeIndex=vis_box_id,
             basePosition=position
         )
+
+        self.bodies.append(
+            Object(
+                id=box_id,
+                pos=position,
+                halfExtents=half_extents,
+                color=color,
+                shape="cube"
+            )
+        )
+
+    def get_bodies(self, robot: SimpleRobot) -> str:
+        """Return the description of all objects in the simulation as a string."""
+        
+        out = ""
+        for obj in self.bodies:
+            out += "- " + obj.get_description() + "\n"
+            out += "  " + obj.get_relative_pos(robot) + "\n"
+
+        return out
+        

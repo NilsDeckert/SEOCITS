@@ -1,17 +1,14 @@
+from numpy.lib import scimath
 import pybullet as p
 from simulation import Simulation
 from robot import SimpleRobot
 from llm import OpenAIOperator, Task, ImageTask
 
-MAX_ATTEMPTS = 15
+MAX_ATTEMPTS = 0
 
 def spawn_obstacles(sim):
-    sim.spawn_cube_at([0, -2, 1])
-    sim.spawn_cube_at([-1, -2, 1])
-    sim.spawn_cube_at([0, 2, 1], color=sim.green)
-    sim.spawn_cube_at([-1, 2, 1], color=sim.green)
-    sim.spawn_cube_at([2, 0, 1], color=sim.yellow)
-    sim.spawn_cube_at([-2, 0, 1], color=sim.yellow)
+    sim.spawn_cube_at([2, 2, 1], color=sim.green)
+    sim.spawn_cube_at([-2, 2, 1], color=sim.red)
 
 def process_response(response):
 

@@ -22,6 +22,21 @@ class Object():
         self.color = color
         self.shape = shape
 
+    def _calc_corners(self):
+        corners = []
+        for i in range(4):
+            # Cycle between -1 and 1.
+            dx, dy = divmod(i, 2)
+            dx = dx * 2 - 1
+            dy = dy * 2 - 1
+            
+            hEx, hEy = self.halfExtents[:2]
+            cx = self.pos[0] + dx * hEx
+            cy = self.pos[1] + dy * hEy
+                
+            corners.append([cx, cy, 0])
+        return corners
+
     def get_relative_pos(self, robot: SimpleRobot) -> str:
         """
         Return a natural language description of the angle and distance
@@ -30,16 +45,26 @@ class Object():
         robot_pos = robot._get_position()
         robot_dir = robot._get_direction_facing()
 
-        distance = math.sqrt((self.pos[0] - robot_pos[0])**2 + (self.pos[1] - robot_pos[1])**2)
-        distance = round(distance, 2)
-        
-        angle = math.atan2(self.pos[1] - robot_pos[1], self.pos[0] - robot_pos[0])
+        # Get coordinates of the objects corners
+        corners = self._calc_corners()
+        corner_distances = []
+        corner_angles = []
 
-        # TODO: Check direction of the angle. Clockwise positive or negative?
-        angle = math.degrees(angle)
-        angle = (angle - robot_dir) % 360
-        angle = round(angle, 2)
-        return f"The object is {distance} units away at an angle of {angle} degrees."
+        for corner in corners:
+            distance = math.sqrt((corner[0] - robot_pos[0])**2 + (corner[1] - robot_pos[1])**2)
+            distance = round(distance, 2)
+            corner_distances.append(distance)
+            angle = math.atan2(corner[1] - robot_pos[1], corner[0] - robot_pos[0])
+            angle = math.degrees(angle)
+            angle = (angle - robot_dir) % 360
+            angle = round(angle, 2)
+            corner_angles.append(angle)
+
+        out = ""
+        for i in range(len(corners)):
+            out += f"Corner {i+1}: {corner_distances[i]} units away at {corner_angles[i]} degrees.\n"
+        return out
+
 
     def get_description(self) -> str:
         obj = self.shape if self.shape else "object"

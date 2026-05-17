@@ -4,7 +4,7 @@ from simulation import Simulation
 from robot import SimpleRobot
 from llm import OpenAIOperator, Task, ImageTask
 
-MAX_ATTEMPTS = 0
+MAX_ATTEMPTS = 1
 
 def spawn_obstacles(sim):
     sim.spawn_cube_at([2, 2, 1], color=sim.green)
@@ -40,7 +40,7 @@ def main():
     operator = OpenAIOperator()
     
     # task = Task(f"Drive to the nearest object and identify its color. Your current lidar scan is the following: {r2d2.get_lidar_scan()}. Index 0 is right in front. All other distances are in 45° steps, counter-clockwise.")
-    task = Task(f"Find a red object and touch it. Your current lidar scan is the following: {r2d2.get_lidar_scan()}.")
+    task = Task(f"Walk around the red object. The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}")
 
     for _ in range(MAX_ATTEMPTS):
         new_task = None
@@ -73,11 +73,13 @@ def main():
                         print(f"Moving forward by {steps} units.")
                         r2d2.move_forward(float(steps))
                         operator.add_command_to_history(f"move_forward({steps})")
-                        
+                        continue                        
+
                     case ["turn", degrees]:
                         print(f"Turning by {degrees} degrees.")
                         r2d2.turn(float(degrees))
                         operator.add_command_to_history(f"turn({degrees})")
+                        continue
 
                     case ["get_lidar_scan", _]:
                         scan = r2d2.get_lidar_scan()
@@ -104,8 +106,14 @@ def main():
                     case [unknown_action, _]:
                         print(f"Error: Recognized format, but unknown action '{unknown_action}'")
                         
+            elif command.startswith("#"):
+                # Allow comments
+                print(command)
+                continue
+            elif command == "":
+                continue
             else:
-                print("Error: Invalid command syntax.")
+                print(f"Error: Invalid command syntax: {command}")
                 sim.sleep(1)
 
         if new_task:
@@ -123,7 +131,7 @@ def main():
             print("\n" * 5)
             break
 
-    sim.sleep(10)
+    sim.sleep(3)
 
     # Clean up
     sim.disconnect()

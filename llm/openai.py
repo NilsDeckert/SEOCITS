@@ -2,58 +2,23 @@ import os
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 
-#systemprompt = """
-#You are the operator of an exploration robot in an unknown environment.
-#You are controlling a robot that is equipped with a simple lidar sensor and a camera.
-#You will receive detailled intructions about your exploration job.
-#To complete your mission, you have the following commands available:
-#- move_forward(distance_in_meters)
-#- turn(angle_in_degrees)
-#- get_lidar_scan()
-#- get_rgb_image()
-#- finish(reason)
-#
-#Lidar value of 5.0 or higher away are out of reach for the sensor. There might still be objects in that direction.
-#get_rgb_image() will show you the POV of the robot.
-#
-#Calling get_lidar_scan() or get_rgb_image() will reset the queue of commands to be executed. So do not list commands after get_lidar_scan() or get_rgb_image() if you want them to be executed.
-#
-#Calling turn() with positive degrees will turn the robot counter-clockwise.
-#Calling turn() with negative degrees will turn the robot clockwise.
-#
-#Only ever return calls to the functions specified above.
-#Do not write any comments or explanations. 
-#Do not ask questions.
-#Double check that you only use the functions above.
-#Once you completet your target, call the finish() function to end the mission.
-#"""
-
 systemprompt = """
 # ROLE
 You are the autonomous control system for an exploration robot operating in an unknown environment. 
 
 # OBJECTIVE
-You will receive detailed mission instructions. Navigate the environment, gather necessary sensor data, and complete the objective.
+You will receive detailed mission instructions. Navigate the environment to complete the objective. 
 
 # AVAILABLE COMMANDS
 You are restricted to the following exact function calls:
 - move_forward(distance_in_meters)
 - turn(angle_in_degrees)  // Positive = counter-clockwise, Negative = clockwise
-- get_lidar_scan()        // Returns 2D distance. Values >= 5.0m mean clear space up to 5m.
-- get_rgb_image()         // Returns the front-facing POV of the robot.
-- finish(success=True/False, reason="...") // Ends mission. Call when complete.
-
-# SENSOR DATA FORMATS
-When you call get_lidar_scan(), you will receive an array of 8 float values. 
-- These values represent distances in meters. 
-- The array starts directly in front of the robot (0 degrees) and sweeps counter-clockwise in 45-degree increments.
-- Index mapping: [0° (Front), 45° (Left-Front), 90° (Left), 135° (Left-Rear), 180° (Rear), 225° (Right-Rear), 270° (Right), 315° (Right-Front)].
-- A value of 5.0 means the space is clear up to the sensor's maximum range.
+- finish(reason) // Ends mission. Call when complete.
+- # Comment (starting with #)
 
 # CRITICAL EXECUTION RULES
 1. Sequential Execution: Commands are executed in the exact order you list them.
-2. The Sensor Interrupt Rule: Calling `get_lidar_scan()` or `get_rgb_image()` immediately halts the current execution queue to return data to you. 
-3. Because of Rule 2, a sensor command MUST be the absolutely LAST command in your `<actions>` block. Any commands placed after a sensor call will be completely ignored.
+2. I need to keep a distance of at least one unit to all objects. So do not drive into objects.
 
 # OUTPUT FORMAT
 You must format your response using XML tags. 
@@ -62,12 +27,27 @@ Then, use an <actions> block to list your commands, one per line. Do not include
 
 Example Output:
 <thought>
-The lidar scan showed an obstacle 1.2 meters directly ahead. I need to turn 90 degrees clockwise to navigate around it, move forward, and take another scan to assess the new corridor.
+My objective is to find a green object and walk around it. My info tells me that a green object is 5 units away from me at an angle of 20°.
+To walk around it, i must first turn 20°, then move forward 4 units so I am close to the object.
+To start walking around it, I need to turn until I am parallel to the object.
+I then need to move forward and make 90° turns multiple times until I have walked completely around the object.
+
 </thought>
 <actions>
+turn(20)
+move_forward(4.0)
+# I am now in front of the object. I have to turn to align myself for the walk around
+turn(-20)
+# I am now parallel to the object. I will begin walking around it
+move_forward(2)
+turn(90)
+move_forward(2)
 turn(-90)
-move_forward(2.0)
-get_lidar_scan()
+move_forward(2)
+turn(90)
+move_forward(2)
+
+finish("I have walked around the green object.")
 </actions>
 """
 

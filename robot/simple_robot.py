@@ -18,6 +18,9 @@ class SimpleRobot:
             joint_name = info[1].decode('utf-8')
             if "wheel" in joint_name:
                 self.wheel_indices.append(i)
+            if joint_name == "gripper_extension":
+                p.resetJointState(self.id, i, targetValue=-0.38)
+                p.setJointMotorControl2(self.id, i, p.POSITION_CONTROL, targetPosition=-0.38)
 
         self.sensors = RobotSensors(self.id)
                 
@@ -77,7 +80,7 @@ class SimpleRobot:
         )
 
         # Run the simulation for a bit to move the robot
-        self.sim.sleep(distance / (target_velocity * 0.1))
+        self.sim.sleep(distance * 2)
         self._post_move()
 
     def turn(self, angle_degrees):

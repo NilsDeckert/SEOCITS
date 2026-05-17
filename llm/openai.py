@@ -40,9 +40,11 @@ move_forward(4.0)
 turn(-20)
 # I am now parallel to the object. I will begin walking around it
 move_forward(2)
+# The object is now to my left. To walk around it, I need to turn left.
+# Turning left is positive! Right would be a negative value.
 turn(90)
 move_forward(2)
-turn(-90)
+turn(90)
 move_forward(2)
 turn(90)
 move_forward(2)
@@ -71,14 +73,17 @@ class OpenAIOperator:
             {"role": "system", "content": systemprompt},
         ]
         self.command_history = []
+        self.task_history = []
 
     def instruct(self, task):
 
-        task += "\n So far you have executed the following commands: "
-        for command in self.command_history:
-            task += f"{command}\n"
+        if len(self.command_history) > 0:
+            task += "\n So far you have executed the following commands: "
+            for command in self.command_history:
+                task += f"{command}\n"
 
         self.messages.append({"role": "user", "content": task})
+        self.task_history.append(task)
 
         response = self.client.chat.completions.create(
             model=self.model,
@@ -87,9 +92,10 @@ class OpenAIOperator:
         return response.choices[0].message.content
 
     def instruct_with_image(self, task, base64_image):
-        task += "\n So far you have executed the following commands: "
-        for command in self.command_history:
-            task += f"{command}\n"
+        if len(self.command_history) > 0:
+            task += "\n So far you have executed the following commands: "
+            for command in self.command_history:
+                task += f"{command}\n"
 
         self.messages.append({
             "role": "user",
@@ -98,6 +104,7 @@ class OpenAIOperator:
                 {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_image}"}}
             ]
         })
+        self.task_history.append(task)
 
         response = self.client.chat.completions.create(
             model=self.model,
@@ -107,3 +114,12 @@ class OpenAIOperator:
 
     def add_command_to_history(self, command):
         self.command_history.append(command)
+    
+    def get_command_history(self):
+        return self.command_history
+
+    def get_system_prompt(self):
+        return systemprompt
+
+    def get_model(self):
+        return self.model

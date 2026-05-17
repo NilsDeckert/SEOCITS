@@ -1,8 +1,9 @@
-from robot import SimpleRobot
 import pybullet as p
 import pybullet_data
 import time
 from .object import Object
+from robot import SimpleRobot
+from .recording import Recording
 
 class Simulation:
     """
@@ -25,16 +26,18 @@ class Simulation:
         self.planeId = p.loadURDF("plane.urdf")
         self.bodies = []
         self._set_camera()
+        self.recording = Recording()
+        self.recording.start()
 
     def _set_camera(self):
         # Configure the camera for a top-down view
         p.resetDebugVisualizerCamera(
-            cameraDistance=12,           # Distance from the target (height)
+            cameraDistance=10,           # Distance from the target (height)
             cameraYaw=0,                 # Heading angle (0 degrees points North)
             cameraPitch=-89.9,           # Tilt angle (-90 is straight down)
             cameraTargetPosition=[0,0,0] # The point the camera is looking at
         )
-        
+
     def sleep(self, seconds):
         """Idle the simulation for a set amount of time without freezing the GUI."""
         steps = int(seconds * 240)
@@ -46,6 +49,7 @@ class Simulation:
         """
         Exit
         """
+        self.recording.stop()
         p.disconnect()
 
     def spawn_cube_at(self, position, color=red):

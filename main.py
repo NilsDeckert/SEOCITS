@@ -34,16 +34,19 @@ def main():
 
     #set the center of mass frame (loadURDF sets base link frame)
     p.resetBasePositionAndOrientation(r2d2.id, startPos, startOrientation)
-    sim.sleep(2.0)
+    sim.sleep(1.0)
     r2d2.get_rgb_image()
 
     operator = OpenAIOperator()
     
     # task = Task(f"Drive to the nearest object and identify its color. Your current lidar scan is the following: {r2d2.get_lidar_scan()}. Index 0 is right in front. All other distances are in 45° steps, counter-clockwise.")
-    task = Task(f"Walk around the red object. The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}")
+    task = Task(f"Walk around the green object. The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}")
 
     for _ in range(MAX_ATTEMPTS):
         new_task = None
+
+        print("=======================")
+        print(f"Task: {task.get_task()}")
         
         # Task is parent type, so we check for ImageTask first
         if isinstance(task, ImageTask):
@@ -55,8 +58,6 @@ def main():
 
         response = process_response(response)
         commands = response.split("\n")
-        print("=======================")
-        print(f"Task: {task.get_task()}")
         for cmd in commands:
             print(f" - {cmd}")
         print("=======================")
@@ -65,7 +66,10 @@ def main():
         message = ""
 
         for command in commands:
-            if "(" in command and command.endswith(")"):
+            if command.startswith("#"):
+                print(command)
+                continue
+            elif "(" in command and command.endswith(")"):
                 parts = command[:-1].split("(")
                 
                 match parts:
@@ -106,10 +110,6 @@ def main():
                     case [unknown_action, _]:
                         print(f"Error: Recognized format, but unknown action '{unknown_action}'")
                         
-            elif command.startswith("#"):
-                # Allow comments
-                print(command)
-                continue
             elif command == "":
                 continue
             else:
@@ -132,6 +132,12 @@ def main():
             break
 
     sim.sleep(3)
+
+    sim.recording.save_prompts(
+        operator.get_model(),
+        operator.get_system_prompt(),
+        operator.task_history,
+        operator.get_command_history())
 
     # Clean up
     sim.disconnect()

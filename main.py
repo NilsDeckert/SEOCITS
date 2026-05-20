@@ -85,6 +85,18 @@ def main():
                         operator.add_command_to_history(f"turn({degrees})")
                         continue
 
+                    case ["turn_right", degrees]:
+                        print(f"Turning right by {degrees} degrees.")
+                        r2d2.turn_right(float(degrees))
+                        operator.add_command_to_history(f"turn_right({degrees})")
+                        continue
+
+                    case ["turn_left", degrees]:
+                        print(f"Turning left by {degrees} degrees.")
+                        r2d2.turn_left(float(degrees))
+                        operator.add_command_to_history(f"turn_left({degrees})")
+                        continue
+
                     case ["get_lidar_scan", _]:
                         scan = r2d2.get_lidar_scan()
                         task_t = f"Your current lidar scan is: {r2d2.get_lidar_scan()}"

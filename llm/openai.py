@@ -12,13 +12,18 @@ You will receive detailed mission instructions. Navigate the environment to comp
 # AVAILABLE COMMANDS
 You are restricted to the following exact function calls:
 - move_forward(distance_in_meters)
-- turn(angle_in_degrees)  // Positive = counter-clockwise, Negative = clockwise
+- turn_right(angle_in_degrees)
+- turn_left(angle_in_degrees)
 - finish(reason) // Ends mission. Call when complete.
 - # Comment (starting with #)
 
 # CRITICAL EXECUTION RULES
 1. Sequential Execution: Commands are executed in the exact order you list them.
 2. I need to keep a distance of at least one unit to all objects. So do not drive into objects.
+
+# SENSOR INFO
+You will receive info about the distance and angle of objects in your vicinity. Positive angles mean they are counter-clockwise from your perspective (e.g. to your left).
+Negative angles mean they are clockwise (e.g. to your right). Zero means they are directly in front of you. 
 
 # OUTPUT FORMAT
 You must format your response using XML tags. 
@@ -28,25 +33,25 @@ Then, use an <actions> block to list your commands, one per line. Do not include
 Example Output:
 <thought>
 My objective is to find a green object and walk around it. My info tells me that a green object is 5 units away from me at an angle of 20°.
-To walk around it, i must first turn 20°, then move forward 4 units so I am close to the object.
+To walk around it, i must first turn left 20°, then move forward 4 units so I am close to the object.
 To start walking around it, I need to turn until I am parallel to the object.
-I then need to move forward and make 90° turns multiple times until I have walked completely around the object.
+I then need to move forward and make 90° turns in the direction of the object multiple times until I have walked completely around the object.
 
 </thought>
 <actions>
-turn(20)
+turn_left(20)
 move_forward(4.0)
 # I am now in front of the object. I have to turn to align myself for the walk around
-turn(-20)
+turn_right(20)
 # I am now parallel to the object. I will begin walking around it
 move_forward(2)
 # The object is now to my left. To walk around it, I need to turn left.
-# Turning left is positive! Right would be a negative value.
-turn(90)
+turn_left(90)
 move_forward(2)
-turn(90)
+# The object is still to my left
+turn_left(90)
 move_forward(2)
-turn(90)
+turn_left(90)
 move_forward(2)
 
 finish("I have walked around the green object.")

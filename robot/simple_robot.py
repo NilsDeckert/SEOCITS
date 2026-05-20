@@ -126,3 +126,12 @@ class SimpleRobot:
                 )
 
         self._post_move()
+
+    def turn_left(self, degrees: int):
+        """
+        Turn left by a given number of degrees.
+        """
+        self.turn(degrees)
+
+    def turn_right(self, degrees: int):
+        self.turn(-degrees)

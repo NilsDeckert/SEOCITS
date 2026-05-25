@@ -63,7 +63,7 @@ class SimpleRobot:
         
     def move_forward(self, distance):
         """
-        Moves the robot forward by 'distance' units in the direction it is facing.
+        Moves the robot forward by 'distance' meters in the direction it is facing.
         This is a 'blocking' function: it steps the simulation itself 
         until the movement is complete.
         """
@@ -135,3 +135,9 @@ class SimpleRobot:
 
     def turn_right(self, degrees: int):
         self.turn(-degrees)
+
+    def reset_position(self):
+        """
+        Resets the robots position and orienation to origin.
+        """
+        p.resetBasePositionAndOrientation(self.id, [0, 0, 1], p.getQuaternionFromEuler([0, 0, 0]))

@@ -1,3 +1,4 @@
+from datetime import datetime
 from numpy.lib import scimath
 import pybullet as p
 from simulation import Simulation
@@ -7,8 +8,16 @@ from llm import OpenAIOperator, Task, ImageTask
 MAX_ATTEMPTS = 1
 
 def spawn_obstacles(sim):
-    sim.spawn_cube_at([2, 2, 1], color=sim.green)
-    sim.spawn_cube_at([-2, 2, 1], color=sim.red)
+    """
+    ..A...B..
+    .........
+    ....X....
+    .........
+    ....C....
+    """
+    sim.spawn_cube_at([2, 2, 1], color=sim.green) # A
+    sim.spawn_cube_at([-2, 2, 1], color=sim.red) # B
+    sim.spawn_cube_at([0, -2, 1], color=sim.blue) # C
 
 def process_response(response):
 
@@ -39,117 +48,141 @@ def main():
 
     operator = OpenAIOperator()
     
-    # task = Task(f"Drive to the nearest object and identify its color. Your current lidar scan is the following: {r2d2.get_lidar_scan()}. Index 0 is right in front. All other distances are in 45° steps, counter-clockwise.")
-    task = Task(f"Walk around the green object. The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}")
+    # task = Task(f"Drive to the nearest object and identify its color. Your current lidar scan is the following: {r2d2.get_lidar_scan()}. Index 0 is right in front. All other distances are in 45 degree steps, counter-clockwise.")
+    tasks = [
+        Task("Turn left 90 degrees"),
+        Task("Turn right 90 degrees"),
+        Task(
+            "Walk 3 meters forward, then turn around and walk back to you original position."
+            + "Turn around until you are facing your starting position again.",
+            output_dir="Back_forth"),
+        Task("Find a green object and touch it", output_dir="Green_object"),
+        Task("Find a red object and touch it", output_dir="Red_object"),
+        Task("Find a blue object and touch it", output_dir="Blue_object"),
+        Task(f"Walk around the green object. The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Circle_green")
+    ]
 
-    for _ in range(MAX_ATTEMPTS):
-        new_task = None
+    parent = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
-        print("=======================")
-        print(f"Task: {task.get_task()}")
-        
-        # Task is parent type, so we check for ImageTask first
-        if isinstance(task, ImageTask):
-            response = operator.instruct_with_image(task.get_task(), task.get_image())
-        elif isinstance(task, Task):
-            response = operator.instruct(task.get_task())
-        else:
-            raise ValueError("Invalid task type")
+    for task in tasks:
 
-        response = process_response(response)
-        commands = response.split("\n")
-        for cmd in commands:
-            print(f" - {cmd}")
-        print("=======================")
-        print("\n")
-        done = False
-        message = ""
+        r2d2.reset_position()
+        sim.sleep(1)
+        output = f"{parent}/{task.get_dir()}"
+        sim.new_recording(output)
 
-        for command in commands:
-            if command.startswith("#"):
-                print(command)
-                continue
-            elif "(" in command and command.endswith(")"):
-                parts = command[:-1].split("(")
-                
-                match parts:
-                    case ["move_forward", steps]:
-                        print(f"Moving forward by {steps} units.")
-                        r2d2.move_forward(float(steps))
-                        operator.add_command_to_history(f"move_forward({steps})")
-                        continue                        
+        for _ in range(MAX_ATTEMPTS):
+            new_task = None
 
-                    case ["turn", degrees]:
-                        print(f"Turning by {degrees} degrees.")
-                        r2d2.turn(float(degrees))
-                        operator.add_command_to_history(f"turn({degrees})")
-                        continue
-
-                    case ["turn_right", degrees]:
-                        print(f"Turning right by {degrees} degrees.")
-                        r2d2.turn_right(float(degrees))
-                        operator.add_command_to_history(f"turn_right({degrees})")
-                        continue
-
-                    case ["turn_left", degrees]:
-                        print(f"Turning left by {degrees} degrees.")
-                        r2d2.turn_left(float(degrees))
-                        operator.add_command_to_history(f"turn_left({degrees})")
-                        continue
-
-                    case ["get_lidar_scan", _]:
-                        scan = r2d2.get_lidar_scan()
-                        task_t = f"Your current lidar scan is: {r2d2.get_lidar_scan()}"
-                        new_task = Task(task_t)
-                        operator.add_command_to_history(f"get_lidar_scan()")
-                        break
-
-                    case ["get_rgb_image", _]:
-                        image = r2d2.get_base64_image()
-                        operator.add_command_to_history(f"get_rgb_image()")
-                        new_task = ImageTask(
-                            "Continue your task. This is your POV.",
-                            image)
-                        break
-
-                    case ["finish", *msgs]:
-                        msg = "(".join(msgs)
-                        print(f"Mission finished with message: {msg}")
-                        done = True
-                        message = msg
-                        break
-                        
-                    case [unknown_action, _]:
-                        print(f"Error: Recognized format, but unknown action '{unknown_action}'")
-                        
-            elif command == "":
-                continue
+            print("=======================")
+            print(f"Task: {task.get_task()}")
+            
+            # Task is parent type, so we check for ImageTask first
+            if isinstance(task, ImageTask):
+                response = operator.instruct_with_image(task.get_task(), task.get_image())
+            elif isinstance(task, Task):
+                response = operator.instruct(task.get_task())
             else:
-                print(f"Error: Invalid command syntax: {command}")
-                sim.sleep(1)
+                raise ValueError("Invalid task type")
 
-        if new_task:
-            task = new_task
-        else:
-            task_t = f"Continue your task. Your current lidar scan is: {r2d2.get_lidar_scan()}"
-            task = Task(task_t)
+            response = process_response(response)
+            commands = response.split("\n")
+            for cmd in commands:
+                print(f" - {cmd}")
+            print("=======================")
+            print("\n")
+            done = False
+            message = ""
 
-        if done == True:
-            print("\n" * 5)
-            print("===============================")
-            print("Mission completed successfully!")
-            print(message)
-            print("===============================")
-            print("\n" * 5)
-            break
+            for command in commands:
+                if command.startswith("#"):
+                    print(command)
+                    continue
+                elif "(" in command and command.endswith(")"):
+                    parts = command[:-1].split("(")
+                    
+                    match parts:
+                        case ["move_forward", steps]:
+                            print(f"Moving forward by {steps} meters.")
+                            r2d2.move_forward(float(steps))
+                            operator.add_command_to_history(f"move_forward({steps})")
+                            continue                        
 
-    sim.sleep(3)
+                        case ["turn", degrees]:
+                            print(f"Turning by {degrees} degrees.")
+                            r2d2.turn(float(degrees))
+                            operator.add_command_to_history(f"turn({degrees})")
+                            continue
 
-    sim.recording.save_prompts(
-        operator.get_model(),
-        operator.get_system_prompt(),
-        operator.task_history,
-        operator.get_command_history())
+                        case ["turn_right", degrees]:
+                            print(f"Turning right by {degrees} degrees.")
+                            r2d2.turn_right(float(degrees))
+                            operator.add_command_to_history(f"turn_right({degrees})")
+                            continue
+
+                        case ["turn_left", degrees]:
+                            print(f"Turning left by {degrees} degrees.")
+                            r2d2.turn_left(float(degrees))
+                            operator.add_command_to_history(f"turn_left({degrees})")
+                            continue
+
+                        case ["get_lidar_scan", _]:
+                            scan = r2d2.get_lidar_scan()
+                            task_t = f"Your current lidar scan is: {r2d2.get_lidar_scan()}"
+                            new_task = Task(task_t)
+                            operator.add_command_to_history(f"get_lidar_scan()")
+                            break
+
+                        case ["get_rgb_image", _]:
+                            image = r2d2.get_base64_image()
+                            operator.add_command_to_history(f"get_rgb_image()")
+                            new_task = ImageTask(
+                                "Continue your task. This is your POV.",
+                                image)
+                            break
+
+                        case ["get_environment", _]:
+                            info = sim.get_bodies()
+                            task_t = f"The current environment is: {info}"
+                            new_task = Task(task_t)
+                            operator.add_command_to_history(f"get_environment()")
+                            break
+
+                        case ["finish", *msgs]:
+                            msg = "(".join(msgs)
+                            print(f"Mission finished with message: {msg}")
+                            done = True
+                            message = msg
+                            break
+                            
+                        case [unknown_action, _]:
+                            print(f"Error: Recognized format, but unknown action '{unknown_action}'")
+                            
+                elif command == "":
+                    continue
+                else:
+                    print(f"Error: Invalid command syntax: {command}")
+                    sim.sleep(1)
+
+            if new_task:
+                task = new_task
+            else:
+                task_t = f"Continue your task. Your current lidar scan is: {r2d2.get_lidar_scan()}"
+                task = Task(task_t)
+
+            if done == True:
+                print("\n" * 5)
+                print("===============================")
+                print("Mission completed successfully!")
+                print(message)
+                print("===============================")
+                print("\n" * 5)
+                break
+
+        sim.sleep(3)
+
+        sim.recording.save_prompts(operator)
 
     # Clean up
     sim.disconnect()

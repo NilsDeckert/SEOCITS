@@ -26,8 +26,6 @@ class Simulation:
         self.planeId = p.loadURDF("plane.urdf")
         self.bodies = []
         self._set_camera()
-        self.recording = Recording()
-        self.recording.start()
 
     def _set_camera(self):
         # Configure the camera for a top-down view
@@ -37,6 +35,10 @@ class Simulation:
             cameraPitch=-89.9,           # Tilt angle (-90 is straight down)
             cameraTargetPosition=[0,0,0] # The point the camera is looking at
         )
+
+    def new_recording(self, output_dir):
+        self.recording = Recording(output_dir)
+        self.recording.start()
 
     def sleep(self, seconds):
         """Idle the simulation for a set amount of time without freezing the GUI."""
@@ -49,7 +51,8 @@ class Simulation:
         """
         Exit
         """
-        self.recording.stop()
+        if self.recording:
+            self.recording.stop()
         p.disconnect()
 
     def spawn_cube_at(self, position, color=red):

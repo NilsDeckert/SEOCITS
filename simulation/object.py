@@ -62,7 +62,7 @@ class Object():
 
         out = ""
         for i in range(len(corners)):
-            out += f"Corner {i+1}: {corner_distances[i]} units away at {corner_angles[i]} degrees.\n"
+            out += f"Corner {i+1}: {corner_distances[i]} meters away at {corner_angles[i]} degrees.\n"
         return out
 
 

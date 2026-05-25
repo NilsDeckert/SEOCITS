@@ -4,10 +4,7 @@ from dotenv import load_dotenv
 
 systemprompt = """
 # ROLE
-You are the autonomous control system for an exploration robot operating in an unknown environment. 
-
-# OBJECTIVE
-You will receive detailed mission instructions. Navigate the environment to complete the objective. 
+You are a developer, writing code to control a robot in an unknown environment.
 
 # AVAILABLE COMMANDS
 You are restricted to the following exact function calls:
@@ -15,27 +12,27 @@ You are restricted to the following exact function calls:
 - turn_right(angle_in_degrees)
 - turn_left(angle_in_degrees)
 - finish(reason) // Ends mission. Call when complete.
-- # Comment (starting with #)
 
 # CRITICAL EXECUTION RULES
 1. Sequential Execution: Commands are executed in the exact order you list them.
-2. I need to keep a distance of at least one unit to all objects. So do not drive into objects.
+2. Unless instructed otherwise, keep a distance of 1 meter to not drive into objects.
 
 # SENSOR INFO
-You will receive info about the distance and angle of objects in your vicinity. Positive angles mean they are counter-clockwise from your perspective (e.g. to your left).
-Negative angles mean they are clockwise (e.g. to your right). Zero means they are directly in front of you. 
+You will receive info about the distance and angle of objects in your vicinity.
+Angles increase counter-clockwise, e.g. 20 degrees is to your left, -30 to your right.
 
 # OUTPUT FORMAT
 You must format your response using XML tags. 
-First, use a <thought> block to briefly plan your route based on your last sensor readings. 
-Then, use an <actions> block to list your commands, one per line. Do not include anything else.
+First, use a <thought> block to plan your route based on your environment info.
+Then, use an <actions> block to list your commands, one per line.
+Include comments starting with #.
 
 Example Output:
 <thought>
-My objective is to find a green object and walk around it. My info tells me that a green object is 5 units away from me at an angle of 20°.
-To walk around it, i must first turn left 20°, then move forward 4 units so I am close to the object.
+My objective is to find a green object and walk around it. My info tells me that a green object is 5 meters away from me at an angle of 20 degrees.
+To walk around it, i must first turn left 20 degrees then move forward 4 meters so I am close to the object.
 To start walking around it, I need to turn until I am parallel to the object.
-I then need to move forward and make 90° turns in the direction of the object multiple times until I have walked completely around the object.
+I then need to move forward and make 90 degrees turns in the direction of the object multiple times until I have walked completely around the object.
 
 </thought>
 <actions>
@@ -64,6 +61,7 @@ MODEL_GPT_4o = "gpt-4o"
 MODEL_GPT_4_1 = "gpt-4.1"
 MODEL_GPT_4_1_MINI = "gpt-4.1-mini"
 MODEL_DEEPSEEK = "DeepSeek-V3.2"
+MODEL_KIMI = "Kimi-K2.5"
 
 class OpenAIOperator:
     def __init__(self):

@@ -9,7 +9,7 @@ from robot import SimpleRobot
 from llm import OpenAIOperator, Task, ImageTask
 
 MAX_ATTEMPTS = 1
-review = True
+review = False
 
 def spawn_obstacles(sim):
     """
@@ -57,19 +57,19 @@ def main():
         #     "Walk 3 meters forward, then turn around and walk back to you original position."
         #     + "Turn around until you are facing your starting position again.",
         #     output_dir="Back_forth"),
-        # Task("Find a green object and touch it"
-        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-        #     output_dir="Touch_Green_object"),
-        # Task("Find a red object and touch it"
-        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-        #     output_dir="Touch_Red_object"),
-        # Task("Find a blue object and touch it"
-        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-        #     output_dir="Touch_Blue_object"),
-        Task("Walk around the green object."
+        Task("Find a green object and touch it. "
+            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Touch_Green_object"),
+        Task("Find a red object and touch it. "
+            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Touch_Red_object"),
+        Task("Find a blue object and touch it. "
+            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Touch_Blue_object"),
+        Task("Walk around the green object. "
             + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
             output_dir="Circle_green"),
-        Task("Walk around the red object."
+        Task("Walk around the red object. "
             + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
             output_dir="Circle_red")
     ]
@@ -79,7 +79,8 @@ def main():
     for task in tasks:
 
         operator = OpenAIOperator(MODEL_GPT_5_3_CHAT)
-        reviewer = Reviewer(MODEL_GPT_5_3_CHAT)
+        if review:
+            reviewer = Reviewer(MODEL_GPT_5_3_CHAT)
         r2d2.reset_position()
         sim.reset_objects()
 

@@ -41,6 +41,8 @@ class Object():
         """
         Return a natural language description of the angle and distance
         of this object in relation to the robot.
+
+        NOTE: IN THIS CASE, THE ANGLES ARE IN THE WRONG DIRECTION DELIBERATELY
         """
         robot_pos = robot._get_position()
         robot_dir = robot._get_direction_facing()
@@ -57,8 +59,8 @@ class Object():
             angle = math.atan2(corner[1] - robot_pos[1], corner[0] - robot_pos[0])
             angle = math.degrees(angle)
             angle = (angle - robot_dir) % 360
-            angle = round(angle, 2)
-            corner_angles.append(angle)
+            angle = round(angle, 2) % 360
+            corner_angles.append(-angle)
 
         out = ""
         for i in range(len(corners)):

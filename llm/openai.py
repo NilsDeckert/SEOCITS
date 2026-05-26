@@ -19,7 +19,7 @@ You are restricted to the following exact function calls:
 
 # SENSOR INFO
 You will receive info about the distance and angle of objects in your vicinity.
-Angles increase counter-clockwise, e.g. 20 degrees is to your left, -30 to your right.
+Angles increase clockwise and decrease counter-clockwise
 
 # OUTPUT FORMAT
 You must format your response using XML tags. 
@@ -36,19 +36,19 @@ I then need to move forward and make 90 degrees turns in the direction of the ob
 
 </thought>
 <actions>
-turn_left(20)
+turn_right(20)
 move_forward(4.0)
 # I am now in front of the object. I have to turn to align myself for the walk around
-turn_right(20)
+turn_left(20)
 # I am now parallel to the object. I will begin walking around it
 move_forward(2)
 # The object is now to my left. To walk around it, I need to turn left.
-turn_left(90)
+turn_right(90)
 move_forward(2)
 # The object is still to my left
-turn_left(90)
+turn_right(90)
 move_forward(2)
-turn_left(90)
+turn_right(90)
 move_forward(2)
 
 finish("I have walked around the green object.")

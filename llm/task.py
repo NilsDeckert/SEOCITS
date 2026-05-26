@@ -1,12 +1,12 @@
 class Task:
-    def __init__(self, task, output_dir=None):
-        self.task = task
+    def __init__(self, task: str, output_dir=None):
+        self.task: str = task
         if output_dir:
             self.output_dir = output_dir
         else:
             self.output_dir = "_".join(task.split(" ")[:3])
     
-    def get_task(self):
+    def get_task(self) -> str:
         return self.task
 
     def get_dir(self):

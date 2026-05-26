@@ -55,6 +55,13 @@ class Simulation:
             self.recording.stop()
         p.disconnect()
 
+    def reset_objects(self):
+        """
+        Reset objects to their initial position
+        """
+        for obj in self.bodies:
+            p.resetBasePositionAndOrientation(obj.id, obj.pos, [0, 0, 0, 1])
+
     def spawn_cube_at(self, position, color=red):
         half_extents = [0.5, 0.5, 1]
 

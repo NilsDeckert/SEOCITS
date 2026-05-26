@@ -1,3 +1,6 @@
+from llm.reviewer import Reviewer
+from llm.openai import MODEL_KIMI
+from llm.openai import MODEL_GPT_5_3_CHAT
 from datetime import datetime
 from numpy.lib import scimath
 import pybullet as p
@@ -6,6 +9,7 @@ from robot import SimpleRobot
 from llm import OpenAIOperator, Task, ImageTask
 
 MAX_ATTEMPTS = 1
+review = True
 
 def spawn_obstacles(sim):
     """
@@ -45,30 +49,46 @@ def main():
     p.resetBasePositionAndOrientation(r2d2.id, startPos, startOrientation)
     sim.sleep(1.0)
     r2d2.get_rgb_image()
-
-    operator = OpenAIOperator()
     
-    # task = Task(f"Drive to the nearest object and identify its color. Your current lidar scan is the following: {r2d2.get_lidar_scan()}. Index 0 is right in front. All other distances are in 45 degree steps, counter-clockwise.")
     tasks = [
-        Task("Turn left 90 degrees"),
-        Task("Turn right 90 degrees"),
-        Task(
-            "Walk 3 meters forward, then turn around and walk back to you original position."
-            + "Turn around until you are facing your starting position again.",
-            output_dir="Back_forth"),
-        Task("Find a green object and touch it", output_dir="Green_object"),
-        Task("Find a red object and touch it", output_dir="Red_object"),
-        Task("Find a blue object and touch it", output_dir="Blue_object"),
-        Task(f"Walk around the green object. The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-            output_dir="Circle_green")
+        # Task("Turn left 90 degrees"),
+        # Task("Turn right 90 degrees"),
+        # Task(
+        #     "Walk 3 meters forward, then turn around and walk back to you original position."
+        #     + "Turn around until you are facing your starting position again.",
+        #     output_dir="Back_forth"),
+        # Task("Find a green object and touch it"
+        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+        #     output_dir="Touch_Green_object"),
+        # Task("Find a red object and touch it"
+        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+        #     output_dir="Touch_Red_object"),
+        # Task("Find a blue object and touch it"
+        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+        #     output_dir="Touch_Blue_object"),
+        Task("Walk around the green object."
+            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Circle_green"),
+        Task("Walk around the red object."
+            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Circle_red")
     ]
 
     parent = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
     for task in tasks:
 
+        operator = OpenAIOperator(MODEL_GPT_5_3_CHAT)
+        reviewer = Reviewer(MODEL_GPT_5_3_CHAT)
         r2d2.reset_position()
-        sim.sleep(1)
+        sim.reset_objects()
+
+        print("\n"*5)
+        print("======================================================")
+        print(task.task)
+        print("======================================================")
+        print("\n"*5)
+        sim.sleep(2)
         output = f"{parent}/{task.get_dir()}"
         sim.new_recording(output)
 
@@ -87,6 +107,9 @@ def main():
                 raise ValueError("Invalid task type")
 
             response = process_response(response)
+            if review:
+                response = reviewer.review(task, response.split("\n"))
+                response = process_response(response)
             commands = response.split("\n")
             for cmd in commands:
                 print(f" - {cmd}")

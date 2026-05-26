@@ -1,3 +1,4 @@
+import config
 import math
 from robot import SimpleRobot
 
@@ -45,7 +46,7 @@ class Object():
         NOTE: IN THIS CASE, THE ANGLES ARE IN THE WRONG DIRECTION DELIBERATELY
         """
         robot_pos = robot._get_position()
-        robot_dir = robot._get_direction_facing()
+        robot_dir = robot._get_direction_facing(config.use_degrees)
 
         # Get coordinates of the objects corners
         corners = self._calc_corners()
@@ -57,14 +58,20 @@ class Object():
             distance = round(distance, 2)
             corner_distances.append(distance)
             angle = math.atan2(corner[1] - robot_pos[1], corner[0] - robot_pos[0])
-            angle = math.degrees(angle)
-            angle = (angle - robot_dir) % 360
-            angle = round(angle, 2) % 360
-            corner_angles.append(-angle)
+            if config.use_degrees:
+                angle = math.degrees(angle)
+                angle = (angle - robot_dir) % 360
+            else:
+                angle = (angle - robot_dir) % (2 * math.pi)
+            angle = round(angle, 2)
+            if config.use_degrees:
+                corner_angles.append(-angle)
+            else:
+                corner_angles.append(angle)
 
         out = ""
         for i in range(len(corners)):
-            out += f"Corner {i+1}: {corner_distances[i]} meters away at {corner_angles[i]} degrees.\n"
+            out += f"Corner {i+1}: {corner_distances[i]} meters away at {corner_angles[i]} {config.unit_angle}.\n"
         return out
 
 

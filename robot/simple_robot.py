@@ -1,3 +1,4 @@
+import config
 from collections import abc
 import simulation
 import math
@@ -40,8 +41,8 @@ class SimpleRobot:
         self.sensors.get_rgb_image()
         # self.sensors.visualize_lidar()
 
-    def _get_direction_facing(self):
-        return self.sensors.get_direction_facing()
+    def _get_direction_facing(self, use_degrees=True):
+        return self.sensors.get_direction_facing(use_degrees)
 
     def _get_position(self):
         return self.sensors.get_position()
@@ -131,9 +132,15 @@ class SimpleRobot:
         """
         Turn left by a given number of degrees.
         """
+        if not config.use_degrees:
+            degrees = round(math.degrees(degrees), 2) % 360
+            print(f"degrees: {degrees}")
         self.turn(degrees)
 
     def turn_right(self, degrees: int):
+        if not config.use_degrees:
+            degrees = round(math.degrees(degrees), 2) % 360
+            print(f"degrees: {degrees}")
         self.turn(-degrees)
 
     def reset_position(self):

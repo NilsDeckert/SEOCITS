@@ -1,16 +1,17 @@
+import config
 import os
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 
-systemprompt = """
+systemprompt = f"""
 # ROLE
 You are a developer, writing code to control a robot in an unknown environment.
 
 # AVAILABLE COMMANDS
 You are restricted to the following exact function calls:
 - move_forward(distance_in_meters)
-- turn_right(angle_in_degrees)
-- turn_left(angle_in_degrees)
+- turn_right(angle in {config.unit_angle})
+- turn_left(angle in {config.unit_angle})
 - finish(reason) // Ends mission. Call when complete.
 
 # CRITICAL EXECUTION RULES
@@ -19,7 +20,7 @@ You are restricted to the following exact function calls:
 
 # SENSOR INFO
 You will receive info about the distance and angle of objects in your vicinity.
-Angles increase clockwise and decrease counter-clockwise
+Angles are in {config.unit_angle} and increase clockwise and decrease counter-clockwise
 
 # OUTPUT FORMAT
 You must format your response using XML tags. 

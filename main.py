@@ -8,8 +8,9 @@ from simulation import Simulation
 from robot import SimpleRobot
 from llm import OpenAIOperator, Task, ImageTask
 
+import config
+
 MAX_ATTEMPTS = 1
-review = False
 
 def spawn_obstacles(sim):
     """
@@ -51,12 +52,12 @@ def main():
     r2d2.get_rgb_image()
     
     tasks = [
-        # Task("Turn left 90 degrees"),
-        # Task("Turn right 90 degrees"),
-        # Task(
-        #     "Walk 3 meters forward, then turn around and walk back to you original position."
-        #     + "Turn around until you are facing your starting position again.",
-        #     output_dir="Back_forth"),
+        Task("Turn left 90 degrees"),
+        Task("Turn right 90 degrees"),
+        Task(
+            "Walk 3 meters forward, then turn around and walk back to you original position."
+            + "Turn around until you are facing your starting position again.",
+            output_dir="Back_forth"),
         Task("Find a green object and touch it. "
             + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
             output_dir="Touch_Green_object"),
@@ -79,7 +80,7 @@ def main():
     for task in tasks:
 
         operator = OpenAIOperator(MODEL_GPT_5_3_CHAT)
-        if review:
+        if config.review:
             reviewer = Reviewer(MODEL_GPT_5_3_CHAT)
         r2d2.reset_position()
         sim.reset_objects()
@@ -108,7 +109,7 @@ def main():
                 raise ValueError("Invalid task type")
 
             response = process_response(response)
-            if review:
+            if config.review:
                 response = reviewer.review(task, response.split("\n"))
                 response = process_response(response)
             commands = response.split("\n")
@@ -134,19 +135,19 @@ def main():
                             continue                        
 
                         case ["turn", degrees]:
-                            print(f"Turning by {degrees} degrees.")
+                            print(f"Turning by {degrees} {config.unit_angle}.")
                             r2d2.turn(float(degrees))
                             operator.add_command_to_history(f"turn({degrees})")
                             continue
 
                         case ["turn_right", degrees]:
-                            print(f"Turning right by {degrees} degrees.")
+                            print(f"Turning right by {degrees} {config.unit_angle}.")
                             r2d2.turn_right(float(degrees))
                             operator.add_command_to_history(f"turn_right({degrees})")
                             continue
 
                         case ["turn_left", degrees]:
-                            print(f"Turning left by {degrees} degrees.")
+                            print(f"Turning left by {degrees} {config.unit_angle}.")
                             r2d2.turn_left(float(degrees))
                             operator.add_command_to_history(f"turn_left({degrees})")
                             continue

@@ -1,13 +1,15 @@
 import os
+import config
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 
-systemprompt = """
+systemprompt = f"""
 # ROLE
 You are a navigation assistant, planning the route of a robot to complete a task
 
 # SENSOR INFO
 You will receive info about the relative distance and angle of objects in your vicinity.
+Angles are in {config.unit_angle}
 Angles increase counter-clockwise, e.g. 20 degrees is to your left, -30 to your right.
 
 # TASK

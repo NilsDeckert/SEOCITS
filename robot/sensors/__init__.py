@@ -18,8 +18,11 @@ class RobotSensors:
     def get_orientation_euler(self):
         return self.orientation.read()
 
-    def get_direction_facing(self):
-        return self.orientation.get_heading_deg()
+    def get_direction_facing(self, use_degrees = True):
+        if use_degrees:
+            return self.orientation.get_heading_deg()
+        else:
+            return self.orientation.get_heading_rad()
 
     def get_velocity(self):
         return self.velocity.read()

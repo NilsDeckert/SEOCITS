@@ -1,19 +1,20 @@
+import config
 from llm import Task
 import os
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 
-systemprompt = """
+systemprompt = f"""
 You are an advanced robot control specialist.
 Your job is to review the robot control instructions written by a junior developer for a given task.
 
-Angles increase clockwise and decrease counter-clockwise
+Angles are in {config.unit_angle} and increase clockwise and decrease counter-clockwise
 
 # AVAILABLE COMMANDS
 You are restricted to the following exact function calls:
 - move_forward(distance_in_meters)
-- turn_right(angle_in_degrees)
-- turn_left(angle_in_degrees)
+- turn_right(angle in {config.unit_angle})
+- turn_left(angle in {config.unit_angle})
 - finish(reason) // Ends mission. Call when complete.
 
 # OUTPUT

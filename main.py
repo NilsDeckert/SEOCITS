@@ -3,8 +3,8 @@ import pybullet as p
 import time
 
 import config
-from experiment import ExperimentSetup
 from simulation import Simulation
+from simulation.experiment import ExperimentSetup
 from robot import SimpleRobot
 from llm.azure import AzureModels
 from llm.gemini import GeminiOperator, GeminiModels
@@ -56,28 +56,31 @@ def main():
     tasks = [
         Task("Turn left 90 degrees", SolutionTurnLeft()),
         Task("Turn right 90 degrees", SolutionTurnRight()),
-        # Task(
-        #     "Walk 3 meters forward, then turn around and walk back to you original position."
-        #     + "Turn around until you are facing your starting position again.",
-        #     output_dir="Back_forth"),
-        # Task("Find a green object and touch it. "
-        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-        #     output_dir="Touch_Green_object"),
-        # Task("Find a red object and touch it. "
-        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-        #     output_dir="Touch_Red_object"),
-        # Task("Find a blue object and touch it. "
-        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-        #     output_dir="Touch_Blue_object"),
-        # Task("Walk around the green object. "
-        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-        #     output_dir="Circle_green"),
-        # Task("Walk around the red object. "
-        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-        #     output_dir="Circle_red"),
-        # Task("Walk around the blue object. "
-        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-        #     output_dir="Circle_blue")
+        Task(
+            "Walk 3 meters forward, then turn around and walk back to you original position."
+            + "Turn around until you are facing your starting position again.",
+            output_dir="Back_forth"),
+        Task("Find a green object and touch it. "
+            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Touch_Green_object"),
+        Task("Find a red object and touch it. "
+            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Touch_Red_object"),
+        Task("Find a blue object and touch it. "
+            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Touch_Blue_object"),
+        Task("Walk around the green object. "
+            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Circle_green"),
+        Task("Walk around the red object. "
+            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Circle_red"),
+        Task("Walk around the blue object. "
+            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Circle_blue"),
+        Task("Walk around the each of the objects. "
+            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Circle_all")
     ]
 
     parent = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')

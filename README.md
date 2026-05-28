@@ -12,8 +12,12 @@ python main.py
 ```
 
 ## Project Structure
+- `llm` - Wrappers to interact with LLMs
+  - `reviewer.py` - Review plans made by class below
+  - `openai.py` - Main class to get robot control commands
 - `simulation/` - Simulation environment
 - `robot/` - Robot API and sensors
   - `sensors/` - Available robot sensors
   - `simple_robot.py` - Simple robot API wrapper
+- `config.py` - File to save and edit settings
 - `main.py` - Main script

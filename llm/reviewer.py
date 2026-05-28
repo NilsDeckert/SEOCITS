@@ -1,6 +1,6 @@
 import config
-from llm import Task
 import os
+from simulation.task import Task
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 

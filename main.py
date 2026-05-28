@@ -1,14 +1,16 @@
-from llm.reviewer import Reviewer
-from llm.openai import MODEL_KIMI
-from llm.openai import MODEL_GPT_5_3_CHAT
 from datetime import datetime
-from numpy.lib import scimath
 import pybullet as p
-from simulation import Simulation
-from robot import SimpleRobot
-from llm import OpenAIOperator, Task, ImageTask
+import time
 
 import config
+from experiment import ExperimentSetup
+from simulation import Simulation
+from robot import SimpleRobot
+from llm.azure import AzureModels
+from llm.gemini import GeminiOperator, GeminiModels
+from llm.reviewer import Reviewer
+from simulation.task import Task, ImageTask
+from simulation.task.solution import *
 
 MAX_ATTEMPTS = 1
 
@@ -52,36 +54,46 @@ def main():
     r2d2.get_rgb_image()
     
     tasks = [
-        Task("Turn left 90 degrees"),
-        Task("Turn right 90 degrees"),
-        Task(
-            "Walk 3 meters forward, then turn around and walk back to you original position."
-            + "Turn around until you are facing your starting position again.",
-            output_dir="Back_forth"),
-        Task("Find a green object and touch it. "
-            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-            output_dir="Touch_Green_object"),
-        Task("Find a red object and touch it. "
-            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-            output_dir="Touch_Red_object"),
-        Task("Find a blue object and touch it. "
-            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-            output_dir="Touch_Blue_object"),
-        Task("Walk around the green object. "
-            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-            output_dir="Circle_green"),
-        Task("Walk around the red object. "
-            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-            output_dir="Circle_red")
+        Task("Turn left 90 degrees", SolutionTurnLeft()),
+        Task("Turn right 90 degrees", SolutionTurnRight()),
+        # Task(
+        #     "Walk 3 meters forward, then turn around and walk back to you original position."
+        #     + "Turn around until you are facing your starting position again.",
+        #     output_dir="Back_forth"),
+        # Task("Find a green object and touch it. "
+        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+        #     output_dir="Touch_Green_object"),
+        # Task("Find a red object and touch it. "
+        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+        #     output_dir="Touch_Red_object"),
+        # Task("Find a blue object and touch it. "
+        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+        #     output_dir="Touch_Blue_object"),
+        # Task("Walk around the green object. "
+        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+        #     output_dir="Circle_green"),
+        # Task("Walk around the red object. "
+        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+        #     output_dir="Circle_red"),
+        # Task("Walk around the blue object. "
+        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+        #     output_dir="Circle_blue")
     ]
 
     parent = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
     for task in tasks:
 
-        operator = OpenAIOperator(MODEL_GPT_5_3_CHAT)
+        setup = ExperimentSetup(
+            model=GeminiModels.FLASH,
+            task=task.task,
+            runs=[],
+        )
+
+        # operator = AzureOperator(MODEL_GPT_5_3_CHAT)
+        operator = GeminiOperator(GeminiModels.FLASH)
         if config.review:
-            reviewer = Reviewer(MODEL_GPT_5_3_CHAT)
+            reviewer = Reviewer(AzureModels.GPT_5_MINI)
         r2d2.reset_position()
         sim.reset_objects()
 
@@ -104,11 +116,17 @@ def main():
             if isinstance(task, ImageTask):
                 response = operator.instruct_with_image(task.get_task(), task.get_image())
             elif isinstance(task, Task):
+                start = time.time()
                 response = operator.instruct(task.get_task())
+                end = time.time()
+                elapsed = end - start
+                print(f"Elapsed time: {elapsed} seconds")
             else:
                 raise ValueError("Invalid task type")
 
             response = process_response(response)
+            if task.quick_validate(response):
+                continue
             if config.review:
                 response = reviewer.review(task, response.split("\n"))
                 response = process_response(response)

@@ -1,7 +1,6 @@
+from abc import ABC, abstractmethod
+
 import config
-import os
-from openai import AzureOpenAI
-from dotenv import load_dotenv
 
 systemprompt = f"""
 # ROLE
@@ -56,75 +55,31 @@ finish("I have walked around the green object.")
 </actions>
 """
 
-MODEL_GPT_5_MINI = "gpt-5-mini"
-MODEL_GPT_5_2_CHAT = "gpt-5.2-chat"
-MODEL_GPT_5_3_CHAT = "gpt-5.3-chat"
-MODEL_GPT_4o = "gpt-4o"
-MODEL_GPT_4_1 = "gpt-4.1"
-MODEL_GPT_4_1_MINI = "gpt-4.1-mini"
-MODEL_DEEPSEEK = "DeepSeek-V3.2"
-MODEL_KIMI = "Kimi-K2.5"
+class Operator(ABC):
+    """
+    Baseclass to define common LLM operations independent of API provider
+    """
+    model = None
+    command_history = []
+    task_history = []
+    system_prompt = systemprompt
 
-class OpenAIOperator:
-    def __init__(self, model: str = MODEL_GPT_5_3_CHAT):
-        load_dotenv("azure.env")
-        self.client = AzureOpenAI(
-            api_version="2025-03-01-preview",
-            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-        )
-        self.model = model
-        self.messages = [
-            {"role": "system", "content": systemprompt},
-        ]
-        self.command_history = []
-        self.task_history = []
+    @abstractmethod
+    def instruct(self, task) -> str:
+        pass
 
-    def instruct(self, task):
-
-        if len(self.command_history) > 0:
-            task += "\n So far you have executed the following commands: "
-            for command in self.command_history:
-                task += f"{command}\n"
-
-        self.messages.append({"role": "user", "content": task})
-        self.task_history.append(task)
-
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=self.messages
-        )
-        return response.choices[0].message.content
-
+    @abstractmethod
     def instruct_with_image(self, task, base64_image):
-        if len(self.command_history) > 0:
-            task += "\n So far you have executed the following commands: "
-            for command in self.command_history:
-                task += f"{command}\n"
-
-        self.messages.append({
-            "role": "user",
-            "content": [
-                {"type": "text", "text": task},
-                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_image}"}}
-            ]
-        })
-        self.task_history.append(task)
-
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=self.messages
-        )
-        return response.choices[0].message.content
+        pass
 
     def add_command_to_history(self, command):
         self.command_history.append(command)
-    
+
     def get_command_history(self):
         return self.command_history
 
-    def get_system_prompt(self):
-        return systemprompt
-
     def get_model(self):
         return self.model
+
+    def get_system_prompt(self):
+        return self.system_prompt

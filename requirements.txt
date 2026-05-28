@@ -1,4 +1,5 @@
 dotenv
+google-genai
 numpy
 openai
 opencv-python

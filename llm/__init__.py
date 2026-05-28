@@ -1,2 +1,1 @@
-from .openai import OpenAIOperator
-from .task import Task, ImageTask
+from .azure import AzureOperator

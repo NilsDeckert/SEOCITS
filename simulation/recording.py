@@ -1,4 +1,4 @@
-from llm import OpenAIOperator
+from llm import AzureOperator
 import datetime
 import os
 import pybullet as p
@@ -37,7 +37,7 @@ class Recording:
             p.stopStateLogging(self.log_id)
             self.log_id = None
 
-    def save_prompts(self, operator: OpenAIOperator):
+    def save_prompts(self, operator: AzureOperator):
         model: str = operator.get_model()
         system: str = operator.get_system_prompt()
         tasks: list[str] = operator.task_history

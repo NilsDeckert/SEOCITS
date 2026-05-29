@@ -21,3 +21,5 @@ python main.py
   - `simple_robot.py` - Simple robot API wrapper
 - `config.py` - File to save and edit settings
 - `main.py` - Main script
+
+![A screenshot of the simulation](./report/images/simulation.png)

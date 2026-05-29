@@ -11,10 +11,10 @@ class Recording:
         :param output_dir: Relative output dir inside OUTPUT_DIR
         """
         self.log_id = None
-        self.output_dir = self._get_output_dir(output_dir)
+        self.output_dir = self.get_output_dir(output_dir)
         os.makedirs(self.output_dir, exist_ok=True)
 
-    def _get_output_dir(self, relative_output_dir):
+    def get_output_dir(self, relative_output_dir):
         """
         Append a given child directory to a valid path for recordings.
         """

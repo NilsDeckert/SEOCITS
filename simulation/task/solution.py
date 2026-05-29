@@ -4,7 +4,7 @@ import config
 class Solution(ABC):
     accepted: list[str]
 
-    def validate(self, proposal) -> bool:
+    def validate(self, proposal: list[str]) -> bool:
         """
         Check if the proposal is in the list of accepted solutions
 
@@ -16,7 +16,7 @@ class Solution(ABC):
 
         # Remove comments, finish()
         filtered = []
-        for line in proposal.splitlines():
+        for line in proposal:
             if line.startswith("#"):
                 continue
             if line.startswith("finish("):

@@ -30,9 +30,13 @@ class GeminiOperator(Operator):
             )
         )
 
-    def instruct(self, task) -> str | None:
+    def instruct(self, task) -> str:
         self.task_history.append(task)
         response = self.chat.send_message(task)
+
+        if not response.text:
+            raise ValueError("LLM did not deliver a response")
+
         return response.text
 
     def instruct_with_image(self, task, base64_image) -> str:

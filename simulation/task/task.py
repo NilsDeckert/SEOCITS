@@ -16,7 +16,7 @@ class Task:
     def get_dir(self):
         return self.output_dir
 
-    def quick_validate(self, proposal) -> bool:
+    def quick_validate(self, proposal: list[str]) -> bool:
         """
         Check if commands are in list of accepted solutions.
         """
@@ -49,7 +49,10 @@ class Task:
         return self.task
 
     def __repr__(self):
-        return self.task
+        out = "==============================\n"
+        out += f"{self.task}\n"
+        out += "=============================="
+        return out
 
     
 class ImageTask(Task):

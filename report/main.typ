@@ -37,17 +37,32 @@ Each object has the same dimensions and both the robot and the objects are posit
 
 == Tasks<tasks>
 
-In order to test the LLMs reasoning capabilites using relative coordinates, the model is tested on multiple tasks with increasing complexity.
+// The following variables are the short forms for the benchmarked tasks
+#let s_TL = "Turn Left"
+#let s_TR = "Turn Right"
+#let s_BF = "Walk Back and Forth"
+#let s_RD = "Touch Red"
+#let s_CG = "Circle Green"
+#let s_CA = "Circle All"
+
+In order to test the LLMs reasoning capabilites using relative coordinates, the model is tested on multiple tasks with increasing complexity. @tab_tasks lists the benchmarked tasks.
 
 #figure(
   table(
-    columns: (auto, auto),
+    columns: (25%, auto),
     table.header(
       [*Short*],
       [*Description*]
-    )
-  )
-)
+    ),
+    [#s_TL],[Turn left 90 degrees],
+    [#s_TR],[Turn right 90 degrees],
+    [#s_BF],[Walk 3 meters forward, then turn around and walk back to you original position. Turn around until you are facing your starting position again.],
+    [#s_RD],[Find a red object and touch it.],
+    [#s_CG],[Walk around the green object.],
+    [#s_CA],[Walk around each of the objects.],
+  ),
+  caption: "Summary of the benchmarked tasks"
+)<tab_tasks>
 
 == Robot API
 
@@ -74,12 +89,12 @@ The LLMs output is then parsed for the described commands. Recognised calls are 
       [*Deepseek*],
       [*Kimi K2*],
     ),
-    [Turn left 90°],[],[],[],[],
-    [Turn right 90°],[],[],[],[],
-    [Walk back and forth],[],[],[],[],
-    [Touch red],[],[],[],[],
-    [Touch green],[],[],[],[],
-    [Touch blue],[],[],[],[],
+    [#s_TL],[],[],[],[],
+    [#s_TR],[],[],[],[],
+    [#s_BF],[],[],[],[],
+    [#s_RD],[],[],[],[],
+    [#s_CG],[],[],[],[],
+    [#s_CA],[],[],[],[],
   ),
   caption: "Success rate per model per task"
 )<tab_succ_gpt>
@@ -93,12 +108,12 @@ The LLMs output is then parsed for the described commands. Recognised calls are 
       [*Gemini 3.5 Flash*],
       [*Gemini 3.5 Flash Lite*]
     ),
-    [Turn left 90°],[],[],[],
-    [Turn right 90°],[],[],[],
-    [Walk back and forth],[],[],[],
-    [Touch red],[],[],[],
-    [Touch green],[],[],[],
-    [Touch blue],[],[],[],
+    [#s_TL],[],[],[],
+    [#s_TR],[],[],[],
+    [#s_BF],[],[],[],
+    [#s_RD],[],[],[],
+    [#s_CG],[],[],[],
+    [#s_CA],[],[],[],
   ),
   caption: "Success rate per model per task"
 )<tab_succ_gemini>

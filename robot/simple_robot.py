@@ -128,7 +128,7 @@ class SimpleRobot:
 
         self._post_move()
 
-    def turn_left(self, degrees: int):
+    def turn_left(self, degrees: float):
         """
         Turn left by a given number of degrees.
         """
@@ -137,7 +137,7 @@ class SimpleRobot:
             print(f"degrees: {degrees}")
         self.turn(degrees)
 
-    def turn_right(self, degrees: int):
+    def turn_right(self, degrees: float):
         if not config.use_degrees:
             degrees = round(math.degrees(degrees), 2) % 360
             print(f"degrees: {degrees}")

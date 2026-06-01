@@ -2,6 +2,7 @@ from datetime import datetime
 import pybullet as p
 import time
 
+from llm import AzureOperator
 from simulation import Simulation
 from simulation.experiment import ExperimentSetup, ExperimentRun
 from robot import SimpleRobot
@@ -12,7 +13,16 @@ from simulation.task import Task, ImageTask
 from simulation.task.solution import *
 
 MAX_ATTEMPTS = 1
-RUNS_PER_SETUP = 3
+RUNS_PER_SETUP = 5
+MODELS_TO_TEST = [
+    AzureModels.GPT_5_MINI,
+    AzureModels.GPT_5_3_CHAT,
+    AzureModels.DEEPSEEK,
+    AzureModels.KIMI,
+    GeminiModels.FLASH,
+    GeminiModels.LIGHT,
+    GeminiModels.PRO
+]
 
 def spawn_obstacles(sim):
     """
@@ -71,6 +81,7 @@ def main():
         Task(
             "Walk 3 meters forward, then turn around and walk back to you original position."
             + "Turn around until you are facing your starting position again.",
+            SolutionBackForth(),
             output_dir="Back_forth"),
         Task("Find a green object and touch it. "
             + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
@@ -100,45 +111,56 @@ def main():
     for task in tasks:
 
         setup = ExperimentSetup(
-            model=GeminiModels.FLASH,
+            model=AzureModels.GPT_5_3_CHAT,
             task=task.task,
             runs=[],
         )
 
-        operator = GeminiOperator(setup.get_model())
-        reviewer = Reviewer(AzureModels.GPT_5_MINI) if config.review else None
-        r2d2.reset_position()
-        sim.reset_objects()
-
-        print(task)
-        sim.sleep(2)
-
         output = f"{parent}/{task.get_dir()}"
         sim.new_recording(output)
 
-        for _ in range(1, RUNS_PER_SETUP):
+        for _ in range(RUNS_PER_SETUP):
+            # operator = GeminiOperator(setup.get_model())
+            operator = AzureOperator(setup.get_model())
+            reviewer = Reviewer(AzureModels.GPT_5_MINI) if config.review else None
+            r2d2.reset_position()
+            sim.reset_objects()
+
+            print(task)
+            sim.sleep(2)
             run = ExperimentRun()
+
+            intermediate_task = task
             for _ in range(MAX_ATTEMPTS):
+                # Two extra task variables to instruct the LLM multiple times to solve one high level task
                 new_task = None
 
                 start = time.time()
-                response = operator.instruct(task.get_task())
+                response = operator.instruct(intermediate_task.get_task())
                 run.add_latency(time.time() - start)
 
-                commands = process_response(task, response, reviewer)
+                commands = process_response(intermediate_task, response, reviewer)
 
-                if task.quick_validate(commands):
+                if intermediate_task.quick_validate(commands):
+                    print("✅ Task was solved")
                     run.add_success(True)
+                    setup.record_run(run)
                     continue
 
                 done = False
                 message = ""
 
                 for command in commands:
-                    if command.startswith("#"):
-                        print(command)
-                        continue
-                    elif "(" in command and command.endswith(")"):
+                    if "#" in command:
+                        if command.startswith("#"):
+                            print(command)
+                            continue
+                        else:
+                            command, comment = command.split('#')
+                            print(comment.strip())
+                            command = command.strip()
+
+                    if "(" in command and command.endswith(")"):
                         parts = command[:-1].split("(")
 
                         match parts:
@@ -167,7 +189,6 @@ def main():
                                 continue
 
                             case ["get_lidar_scan", _]:
-                                scan = r2d2.get_lidar_scan()
                                 task_t = f"Your current lidar scan is: {r2d2.get_lidar_scan()}"
                                 new_task = Task(task_t)
                                 operator.add_command_to_history(f"get_lidar_scan()")
@@ -182,7 +203,7 @@ def main():
                                 break
 
                             case ["get_environment", _]:
-                                info = sim.get_bodies()
+                                info = sim.get_bodies(r2d2)
                                 task_t = f"The current environment is: {info}"
                                 new_task = Task(task_t)
                                 operator.add_command_to_history(f"get_environment()")
@@ -205,12 +226,12 @@ def main():
                         sim.sleep(1)
 
                 if new_task:
-                    task = new_task
+                    intermediate_task = new_task
                 else:
                     task_t = f"Continue your task. Your current lidar scan is: {r2d2.get_lidar_scan()}"
-                    task = Task(task_t)
+                    intermediate_task = Task(task_t)
 
-                if done == True:
+                if done:
                     print("\n" * 5)
                     print("===============================")
                     print("Mission completed successfully!")
@@ -219,6 +240,12 @@ def main():
                     print("\n" * 5)
                     break
 
+            if task.validate():
+                run.add_success(True)
+            else:
+                run.add_success(False)
+                comment = input("Comment this run: ")
+                if comment != "": run.add_comment(comment)
             setup.record_run(run)
 
         sim.sleep(3)

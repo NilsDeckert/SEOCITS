@@ -22,12 +22,18 @@ class Solution(ABC):
                 continue
             if line.startswith("finish("):
                 continue
-            filtered.append(line)
+            line = line.strip()
+            if line:
+                filtered.append(line)
         proposal = "\n".join(filtered)
 
         if proposal in self.accepted:
             return True
         else:
+            print("PROPOSAL:")
+            print(proposal)
+            print("ACCEPTED:")
+            print(self.accepted)
             return False
 
 class SolutionTurnLeft(Solution):
@@ -95,3 +101,17 @@ class SolutionBackForth(Solution):
             solution_string = '\n'.join([m1, t1, m2, t2])
 
             self.accepted.append(solution_string)
+
+class SolutionTouchRed(Solution):
+    """Optimal Solution for task 'turn right 90 degrees'"""
+    def __init__(self):
+        if config.use_degrees:
+            self.accepted = [
+                "turn_left(45)\nmove_forward(2.1)",
+                "turn_left(45)\nmove_forward(2.12)",
+                "turn_left(45)\nmove_forward(2.2)",
+                "turn_left(45.0)\nmove_forward(2.2)",
+            ]
+        else:
+            self.accepted = [
+            ]

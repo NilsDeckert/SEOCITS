@@ -1,5 +1,9 @@
 import json
+from enum import StrEnum
 from dataclasses import dataclass, asdict
+
+
+from llm import AzureModels, GeminiModels
 from .task.task import Task
 
 @dataclass
@@ -25,16 +29,19 @@ class ExperimentRun:
     def add_comment(self, comment: str):
         self.comment = comment
 
+    def was_successful(self) -> bool:
+        return self.success
+
 @dataclass
 class ExperimentSetup:
-    model: str
+    model: AzureModels | GeminiModels
     task: Task
     runs: list[ExperimentRun]
 
     def record_run(self, run: ExperimentRun):
         self.runs.append(run)
 
-    def get_model(self) -> str:
+    def get_model(self) -> StrEnum:
         return self.model
 
     def write_to_file(self, path):

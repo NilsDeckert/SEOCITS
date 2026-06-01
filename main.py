@@ -2,7 +2,7 @@ from datetime import datetime
 import pybullet as p
 import time
 
-from llm import AzureOperator
+from llm import AzureOperator, new_operator
 from simulation import Simulation
 from simulation.experiment import ExperimentSetup, ExperimentRun
 from robot import SimpleRobot
@@ -13,7 +13,7 @@ from simulation.task import Task, ImageTask
 from simulation.task.solution import *
 
 MAX_ATTEMPTS = 1
-RUNS_PER_SETUP = 5
+RUNS_PER_SETUP = 20
 MODELS_TO_TEST = [
     AzureModels.GPT_5_MINI,
     AzureModels.GPT_5_3_CHAT,
@@ -76,181 +76,178 @@ def main():
     r2d2.get_rgb_image()
     
     tasks = [
-        Task("Turn left 90 degrees", SolutionTurnLeft()),
-        Task("Turn right 90 degrees", SolutionTurnRight()),
-        Task(
-            "Walk 3 meters forward, then turn around and walk back to you original position."
-            + "Turn around until you are facing your starting position again.",
-            SolutionBackForth(),
-            output_dir="Back_forth"),
-        Task("Find a green object and touch it. "
-            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-            output_dir="Touch_Green_object"),
+        # Task("Turn left 90 degrees", SolutionTurnLeft()),
+        # Task("Turn right 90 degrees", SolutionTurnRight()),
+        # Task(
+        #     "Walk 3 meters forward, then turn around and walk back to you original position."
+        #     + "Turn around until you are facing your starting position again.",
+        #     SolutionBackForth(),
+        #     output_dir="Back_forth"),
         Task("Find a red object and touch it. "
             + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+             SolutionTouchRed(),
             output_dir="Touch_Red_object"),
-        Task("Find a blue object and touch it. "
-            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-            output_dir="Touch_Blue_object"),
-        Task("Walk around the green object. "
-            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-            output_dir="Circle_green"),
-        Task("Walk around the red object. "
-            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-            output_dir="Circle_red"),
-        Task("Walk around the blue object. "
-            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-            output_dir="Circle_blue"),
-        Task("Walk around the each of the objects. "
-            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-            output_dir="Circle_all")
+        # Task("Walk around the green object. "
+        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+        #     output_dir="Circle_green"),
+        # Task("Walk around each of the objects. "
+        #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+        #     output_dir="Circle_all")
     ]
 
-    parent = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
-    for task in tasks:
+    # output file structure:
+    # /turn_left_90/gpt_5_3_pro/2026-06-01/output.jsonl
+    for model in MODELS_TO_TEST:
+        for task in tasks:
 
-        setup = ExperimentSetup(
-            model=AzureModels.GPT_5_3_CHAT,
-            task=task.task,
-            runs=[],
-        )
+            setup = ExperimentSetup(
+                model=AzureModels.GPT_5_3_CHAT,
+                task=task.task,
+                runs=[],
+            )
 
-        output = f"{parent}/{task.get_dir()}"
-        sim.new_recording(output)
+            # output = f"{parent}/{task.get_dir()}"
+            output = f"{model}/{task.get_dir()}/{timestamp}"
+            sim.new_recording(output)
 
-        for _ in range(RUNS_PER_SETUP):
-            # operator = GeminiOperator(setup.get_model())
-            operator = AzureOperator(setup.get_model())
-            reviewer = Reviewer(AzureModels.GPT_5_MINI) if config.review else None
-            r2d2.reset_position()
-            sim.reset_objects()
+            for r in range(RUNS_PER_SETUP):
+                # operator = GeminiOperator(setup.get_model())
+                # operator = AzureOperator(setup.get_model())
+                operator = new_operator(setup.get_model())
+                reviewer = Reviewer(AzureModels.GPT_5_MINI) if config.review else None
+                r2d2.reset_position()
+                sim.reset_objects()
 
-            print(task)
-            sim.sleep(2)
-            run = ExperimentRun()
+                print(task)
+                sim.sleep(2)
+                run = ExperimentRun()
 
-            intermediate_task = task
-            for _ in range(MAX_ATTEMPTS):
-                # Two extra task variables to instruct the LLM multiple times to solve one high level task
-                new_task = None
+                intermediate_task = task
+                for _ in range(MAX_ATTEMPTS):
+                    # Two extra task variables to instruct the LLM multiple times to solve one high level task
+                    new_task = None
 
-                start = time.time()
-                response = operator.instruct(intermediate_task.get_task())
-                run.add_latency(time.time() - start)
+                    start = time.time()
+                    response = operator.instruct(intermediate_task.get_task())
+                    run.add_latency(time.time() - start)
 
-                commands = process_response(intermediate_task, response, reviewer)
+                    commands = process_response(intermediate_task, response, reviewer)
 
-                if intermediate_task.quick_validate(commands):
-                    print("✅ Task was solved")
-                    run.add_success(True)
-                    setup.record_run(run)
-                    continue
+                    if intermediate_task.quick_validate(commands):
+                        print(f" {r+1}/{RUNS_PER_SETUP} ✅ Task was solved")
+                        run.add_success(True)
+                        setup.record_run(run)
+                        continue
 
-                done = False
-                message = ""
+                    done = False
+                    message = ""
 
-                for command in commands:
-                    if "#" in command:
-                        if command.startswith("#"):
-                            print(command)
+                    for command in commands:
+                        if "#" in command:
+                            if command.startswith("#"):
+                                print(command)
+                                continue
+                            else:
+                                command, comment = command.split('#')
+                                print(comment.strip())
+                                command = command.strip()
+
+                        if "(" in command and command.endswith(")"):
+                            parts = command[:-1].split("(")
+
+                            match parts:
+                                case ["move_forward", steps]:
+                                    print(f"Moving forward by {steps} meters.")
+                                    r2d2.move_forward(float(steps))
+                                    operator.add_command_to_history(f"move_forward({steps})")
+                                    continue
+
+                                case ["turn", degrees]:
+                                    print(f"Turning by {degrees} {config.unit_angle}.")
+                                    r2d2.turn(float(degrees))
+                                    operator.add_command_to_history(f"turn({degrees})")
+                                    continue
+
+                                case ["turn_right", degrees]:
+                                    print(f"Turning right by {degrees} {config.unit_angle}.")
+                                    r2d2.turn_right(float(degrees))
+                                    operator.add_command_to_history(f"turn_right({degrees})")
+                                    continue
+
+                                case ["turn_left", degrees]:
+                                    print(f"Turning left by {degrees} {config.unit_angle}.")
+                                    r2d2.turn_left(float(degrees))
+                                    operator.add_command_to_history(f"turn_left({degrees})")
+                                    continue
+
+                                case ["get_lidar_scan", _]:
+                                    task_t = f"Your current lidar scan is: {r2d2.get_lidar_scan()}"
+                                    new_task = Task(task_t)
+                                    operator.add_command_to_history(f"get_lidar_scan()")
+                                    break
+
+                                case ["get_rgb_image", _]:
+                                    image = r2d2.get_base64_image()
+                                    operator.add_command_to_history(f"get_rgb_image()")
+                                    new_task = ImageTask(
+                                        "Continue your task. This is your POV.",
+                                        image)
+                                    break
+
+                                case ["get_environment", _]:
+                                    info = sim.get_bodies(r2d2)
+                                    task_t = f"The current environment is: {info}"
+                                    new_task = Task(task_t)
+                                    operator.add_command_to_history(f"get_environment()")
+                                    break
+
+                                case ["finish", *msgs]:
+                                    msg = "(".join(msgs)
+                                    print(f"Mission finished with message: {msg}")
+                                    done = True
+                                    message = msg
+                                    break
+
+                                case [unknown_action, _]:
+                                    print(f"Error: Recognized format, but unknown action '{unknown_action}'")
+
+                        elif command == "":
                             continue
                         else:
-                            command, comment = command.split('#')
-                            print(comment.strip())
-                            command = command.strip()
+                            print(f"Error: Invalid command syntax: {command}")
+                            sim.sleep(1)
 
-                    if "(" in command and command.endswith(")"):
-                        parts = command[:-1].split("(")
-
-                        match parts:
-                            case ["move_forward", steps]:
-                                print(f"Moving forward by {steps} meters.")
-                                r2d2.move_forward(float(steps))
-                                operator.add_command_to_history(f"move_forward({steps})")
-                                continue
-
-                            case ["turn", degrees]:
-                                print(f"Turning by {degrees} {config.unit_angle}.")
-                                r2d2.turn(float(degrees))
-                                operator.add_command_to_history(f"turn({degrees})")
-                                continue
-
-                            case ["turn_right", degrees]:
-                                print(f"Turning right by {degrees} {config.unit_angle}.")
-                                r2d2.turn_right(float(degrees))
-                                operator.add_command_to_history(f"turn_right({degrees})")
-                                continue
-
-                            case ["turn_left", degrees]:
-                                print(f"Turning left by {degrees} {config.unit_angle}.")
-                                r2d2.turn_left(float(degrees))
-                                operator.add_command_to_history(f"turn_left({degrees})")
-                                continue
-
-                            case ["get_lidar_scan", _]:
-                                task_t = f"Your current lidar scan is: {r2d2.get_lidar_scan()}"
-                                new_task = Task(task_t)
-                                operator.add_command_to_history(f"get_lidar_scan()")
-                                break
-
-                            case ["get_rgb_image", _]:
-                                image = r2d2.get_base64_image()
-                                operator.add_command_to_history(f"get_rgb_image()")
-                                new_task = ImageTask(
-                                    "Continue your task. This is your POV.",
-                                    image)
-                                break
-
-                            case ["get_environment", _]:
-                                info = sim.get_bodies(r2d2)
-                                task_t = f"The current environment is: {info}"
-                                new_task = Task(task_t)
-                                operator.add_command_to_history(f"get_environment()")
-                                break
-
-                            case ["finish", *msgs]:
-                                msg = "(".join(msgs)
-                                print(f"Mission finished with message: {msg}")
-                                done = True
-                                message = msg
-                                break
-
-                            case [unknown_action, _]:
-                                print(f"Error: Recognized format, but unknown action '{unknown_action}'")
-
-                    elif command == "":
-                        continue
+                    if new_task:
+                        intermediate_task = new_task
                     else:
-                        print(f"Error: Invalid command syntax: {command}")
-                        sim.sleep(1)
+                        task_t = f"Continue your task. Your current lidar scan is: {r2d2.get_lidar_scan()}"
+                        intermediate_task = Task(task_t)
 
-                if new_task:
-                    intermediate_task = new_task
-                else:
-                    task_t = f"Continue your task. Your current lidar scan is: {r2d2.get_lidar_scan()}"
-                    intermediate_task = Task(task_t)
+                    if done:
+                        print("\n" * 5)
+                        print("===============================")
+                        print("Mission completed successfully!")
+                        print(message)
+                        print("===============================")
+                        print("\n" * 5)
+                        break
 
-                if done:
-                    print("\n" * 5)
-                    print("===============================")
-                    print("Mission completed successfully!")
-                    print(message)
-                    print("===============================")
-                    print("\n" * 5)
-                    break
+                if not run.was_successful():
+                    if task.validate():
+                        print(f" {r+1}/{RUNS_PER_SETUP} ✅ Task was solved")
+                        run.add_success(True)
+                    else:
+                        run.add_success(False)
+                        print(f" {r+1}/{RUNS_PER_SETUP} X Task was NOT solved")
+                        comment = input("Comment this run: ")
+                        if comment != "": run.add_comment(comment)
+                setup.record_run(run)
 
-            if task.validate():
-                run.add_success(True)
-            else:
-                run.add_success(False)
-                comment = input("Comment this run: ")
-                if comment != "": run.add_comment(comment)
-            setup.record_run(run)
-
-        sim.sleep(3)
-        sim.recording.save_prompts(operator)
-        setup.write_to_file(f"{sim.recording.output_dir}/summary.jsonl")
+            sim.sleep(3)
+            sim.recording.save_prompts(operator)
+            setup.write_to_file(f"{sim.recording.output_dir}/summary.jsonl")
 
     # Clean up
     sim.disconnect()

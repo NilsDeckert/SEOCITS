@@ -101,10 +101,9 @@
   
   let results = (:)
   for (task, runs) in tasks.pairs() {
-    results.insert(task, (
-      success-rate: calc-success-rate(runs),
-      median-latency: calc-median-latency(runs)
-    ))
+
+    results.insert("success-rate", calc-success-rate(runs))
+    results.insert("median-latency", calc-median-latency(runs))
   }
   return results
 }

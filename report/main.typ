@@ -76,8 +76,34 @@ The LLMs output is then parsed for the described commands. Recognised calls are 
 
 = Results
 
-#let path_tl_gpt_chat = "/benchmark/turn_left_90.jsonl"
-#let path_tr_gpt_chat = "/benchmark/turn_right_90.jsonl"
+#let models = (
+  "gpt-5-mini",
+  "gpt-5.3-chat",
+  "DeepSeek-V3.2",
+  "Kimi-K2.5",
+  "gemini-3.1-flash-lite",
+  "gemini-3.5-flash",
+  "gemini-3.1-pro-preview"
+)
+
+// Create a list of all .jsonl files per task
+// Not all benchmarks where done at once
+
+// TURN LEFT
+#let date1 = "2026-06-01_20-39-59"
+#let paths_tl = models.map(m => "/benchmark/"+m+"/Turn_left_90/"+date1+"/summary.jsonl")
+#let srs_tl = paths_tl.map(p => get-file-metrics(p).at("success-rate"))
+#let ml_tl = paths_tl.map(p => get-file-metrics(p).at("median-latency"))
+
+// TURN RIGHT
+#let paths_tr = models.map(m => "/benchmark/"+m+"/Turn_right_90/"+date1+"/summary.jsonl")
+#let srs_tr = paths_tr.map(p => get-file-metrics(p).at("success-rate"))
+#let ml_tr = paths_tr.map(p => get-file-metrics(p).at("median-latency"))
+
+// WALK BACK FORTH
+#let paths_bf = models.map(m => "/benchmark/"+m+"/Back_forth/"+date1+"/summary.jsonl")
+#let srs_bf = paths_bf.map(p => get-file-metrics(p).at("success-rate"))
+#let ml_bf = paths_bf.map(p => get-file-metrics(p).at("median-latency"))
 
 #figure(
   table(
@@ -89,9 +115,9 @@ The LLMs output is then parsed for the described commands. Recognised calls are 
       [*Deepseek*],
       [*Kimi K2*],
     ),
-    [#s_TL],[],[],[],[],
-    [#s_TR],[],[],[],[],
-    [#s_BF],[],[],[],[],
+    [#s_TL],[#srs_tl.at(0)],[#srs_tl.at(1)],[#srs_tl.at(2)],[#srs_tl.at(3)],
+    [#s_TR],[#srs_tr.at(0)],[#srs_tr.at(1)],[#srs_tr.at(2)],[#srs_tr.at(3)],
+    [#s_BF],[#srs_bf.at(0)],[#srs_bf.at(1)],[#srs_bf.at(2)],[#srs_bf.at(3)],
     [#s_RD],[],[],[],[],
     [#s_CG],[],[],[],[],
     [#s_CA],[],[],[],[],

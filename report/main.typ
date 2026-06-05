@@ -1,5 +1,5 @@
 #import "@preview/charged-ieee:0.1.4": ieee
-#import "functions/summary_table.typ": *
+#import "functions/benchmark_results.typ": *
 
 #show: ieee.with(
   title: [
@@ -76,34 +76,6 @@ The LLMs output is then parsed for the described commands. Recognised calls are 
 
 = Results
 
-#let models = (
-  "gpt-5-mini",
-  "gpt-5.3-chat",
-  "DeepSeek-V3.2",
-  "Kimi-K2.5",
-  "gemini-3.1-flash-lite",
-  "gemini-3.5-flash",
-  "gemini-3.1-pro-preview"
-)
-
-// Create a list of all .jsonl files per task
-// Not all benchmarks where done at once
-
-// TURN LEFT
-#let date1 = "2026-06-01_20-39-59"
-#let paths_tl = models.map(m => "/benchmark/"+m+"/Turn_left_90/"+date1+"/summary.jsonl")
-#let srs_tl = paths_tl.map(p => get-file-metrics(p).at("success-rate"))
-#let ml_tl = paths_tl.map(p => get-file-metrics(p).at("median-latency"))
-
-// TURN RIGHT
-#let paths_tr = models.map(m => "/benchmark/"+m+"/Turn_right_90/"+date1+"/summary.jsonl")
-#let srs_tr = paths_tr.map(p => get-file-metrics(p).at("success-rate"))
-#let ml_tr = paths_tr.map(p => get-file-metrics(p).at("median-latency"))
-
-// WALK BACK FORTH
-#let paths_bf = models.map(m => "/benchmark/"+m+"/Back_forth/"+date1+"/summary.jsonl")
-#let srs_bf = paths_bf.map(p => get-file-metrics(p).at("success-rate"))
-#let ml_bf = paths_bf.map(p => get-file-metrics(p).at("median-latency"))
 
 #figure(
   table(
@@ -118,7 +90,7 @@ The LLMs output is then parsed for the described commands. Recognised calls are 
     [#s_TL],[#srs_tl.at(0)],[#srs_tl.at(1)],[#srs_tl.at(2)],[#srs_tl.at(3)],
     [#s_TR],[#srs_tr.at(0)],[#srs_tr.at(1)],[#srs_tr.at(2)],[#srs_tr.at(3)],
     [#s_BF],[#srs_bf.at(0)],[#srs_bf.at(1)],[#srs_bf.at(2)],[#srs_bf.at(3)],
-    [#s_RD],[],[],[],[],
+    [#s_RD],[#srs_tred.at(0)],[#srs_tred.at(1)],[#srs_tred.at(2)],[#srs_tred.at(3)],
     [#s_CG],[],[],[],[],
     [#s_CA],[],[],[],[],
   ),
@@ -134,15 +106,54 @@ The LLMs output is then parsed for the described commands. Recognised calls are 
       [*Gemini 3.5 Flash*],
       [*Gemini 3.5 Flash Lite*]
     ),
-    [#s_TL],[],[],[],
-    [#s_TR],[],[],[],
-    [#s_BF],[],[],[],
-    [#s_RD],[],[],[],
+    [#s_TL],[#srs_tl.at(4)],[#srs_tl.at(5)],[#srs_tl.at(6)],
+    [#s_TR],[#srs_tr.at(4)],[#srs_tr.at(5)],[#srs_tr.at(6)],
+    [#s_BF],[#srs_bf.at(4)],[#srs_bf.at(5)],[#srs_bf.at(6)],
+    [#s_RD],[#srs_tred.at(4)],[#srs_tred.at(5)],[#srs_tred.at(6)],
     [#s_CG],[],[],[],
     [#s_CA],[],[],[],
   ),
   caption: "Success rate per model per task"
 )<tab_succ_gemini>
+
+#figure(
+  table(
+    columns: (auto, auto, auto, auto, auto),
+    table.header(
+      [*Task*],
+      [*GPT 5 Mini*],
+      [*GPT 5.3 Chat*],
+      [*Deepseek*],
+      [*Kimi K2*],
+    ),
+    [#s_TL],[#ml_tl.at(0)],[#ml_tl.at(1)],[#ml_tl.at(2)],[#ml_tl.at(3)],
+    [#s_TR],[#ml_tr.at(0)],[#ml_tr.at(1)],[#ml_tr.at(2)],[#ml_tr.at(3)],
+    [#s_BF],[#ml_bf.at(0)],[#ml_bf.at(1)],[#ml_bf.at(2)],[#ml_bf.at(3)],
+    [#s_RD],[#ml_tred.at(0)],[#ml_tred.at(1)],[#ml_tred.at(2)],[#ml_tred.at(3)],
+    [#s_CG],[],[],[],[],
+    [#s_CA],[],[],[],[],
+  ),
+  caption: "Median latency per model per task"
+)<tab_lat_gpt>
+
+#figure(
+  table(
+    columns: (auto, auto, auto, auto),
+    table.header(
+      [*Task*],
+      [*Gemini 3.1 Pro*],
+      [*Gemini 3.5 Flash*],
+      [*Gemini 3.5 Flash Lite*]
+    ),
+    [#s_TL],[#ml_tl.at(4)],[#ml_tl.at(5)],[#ml_tl.at(6)],
+    [#s_TR],[#ml_tr.at(4)],[#ml_tr.at(5)],[#ml_tr.at(6)],
+    [#s_BF],[#ml_bf.at(4)],[#ml_bf.at(5)],[#ml_bf.at(6)],
+    [#s_RD],[#ml_tred.at(4)],[#ml_tred.at(5)],[#ml_tred.at(6)],
+    [#s_CG],[],[],[],
+    [#s_CA],[],[],[],
+  ),
+  caption: "Median latency per model per task"
+)<tab_lat_gemini>
 
 = Discussion
 

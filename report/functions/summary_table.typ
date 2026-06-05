@@ -5,7 +5,8 @@
   let total = runs.len()
   if total == 0 { return 0 }
   let successes = runs.filter(r => r.success == true).len()
-  return successes / total * 100
+  // return successes / total * 100
+  return str(successes) + "/" + str(total)
 }
 
 // Helper: Calculate Median Latency from an array of runs
@@ -22,7 +23,9 @@
     // Even number of elements: average the two middle ones
     let mid-right = int(n / 2)
     let mid-left = mid-right - 1
-    return (latencies.at(mid-left) + latencies.at(mid-right)) / 2.0
+    let ret = (latencies.at(mid-left) + latencies.at(mid-right)) / 2.0
+    // return ret
+    return calc.round(ret, digits: 2)
   }
 }
 

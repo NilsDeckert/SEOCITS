@@ -97,20 +97,22 @@ The LLMs output is then parsed for the described commands. Recognised calls are 
   caption: "Success rate per model per task"
 )<tab_succ_gpt>
 
+NOTE: Gemini Flash made left turns around green object. All (?) other (non-gemini) models made right turns (like in example)
+
 #figure(
   table(
     columns: (auto, auto, auto, auto),
     table.header(
       [*Task*],
-      [*Gemini 3.1 Pro*],
+      [*Gemini 3.5 Flash Lite*],
       [*Gemini 3.5 Flash*],
-      [*Gemini 3.5 Flash Lite*]
+      [*Gemini 3.1 Pro*],
     ),
     [#s_TL],[#srs_tl.at(4)],[#srs_tl.at(5)],[#srs_tl.at(6)],
     [#s_TR],[#srs_tr.at(4)],[#srs_tr.at(5)],[#srs_tr.at(6)],
     [#s_BF],[#srs_bf.at(4)],[#srs_bf.at(5)],[#srs_bf.at(6)],
     [#s_RD],[#srs_rd.at(4)],[#srs_rd.at(5)],[#srs_rd.at(6)],
-    [#s_CG],[],[],[],
+    [#s_CG],[#srs_cg.at(4)],[#srs_cg.at(5)],[#srs_cg.at(6)],
     [#s_CA],[],[],[],
   ),
   caption: "Success rate per model per task"
@@ -141,15 +143,15 @@ The LLMs output is then parsed for the described commands. Recognised calls are 
     columns: (auto, auto, auto, auto),
     table.header(
       [*Task*],
-      [*Gemini 3.1 Pro*],
+      [*Gemini 3.5 Flash Lite*],
       [*Gemini 3.5 Flash*],
-      [*Gemini 3.5 Flash Lite*]
+      [*Gemini 3.1 Pro*],
     ),
     [#s_TL],[#ml_tl.at(4)],[#ml_tl.at(5)],[#ml_tl.at(6)],
     [#s_TR],[#ml_tr.at(4)],[#ml_tr.at(5)],[#ml_tr.at(6)],
     [#s_BF],[#ml_bf.at(4)],[#ml_bf.at(5)],[#ml_bf.at(6)],
     [#s_RD],[#ml_rd.at(4)],[#ml_rd.at(5)],[#ml_rd.at(6)],
-    [#s_CG],[],[],[],
+    [#s_CG],[#ml_cg.at(4)],[#ml_cg.at(5)],[#ml_cg.at(6)],
     [#s_CA],[],[],[],
   ),
   caption: "Median latency per model per task"

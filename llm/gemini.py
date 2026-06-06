@@ -11,7 +11,7 @@ from llm.operator import Operator
 class GeminiModels(StrEnum):
     PRO = "gemini-3.1-pro-preview"
     FLASH = "gemini-3.5-flash"
-    LIGHT = "gemini-3.1-flash-lite"
+    LITE = "gemini-3.1-flash-lite"
 
 class GeminiOperator(Operator):
     """

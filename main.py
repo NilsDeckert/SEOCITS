@@ -15,13 +15,13 @@ from simulation.task.solution import *
 MAX_ATTEMPTS = 1
 RUNS_PER_SETUP = 20
 MODELS_TO_TEST = [
-    AzureModels.GPT_5_MINI,
-    AzureModels.GPT_5_3_CHAT,
-    AzureModels.DEEPSEEK,
+    # AzureModels.GPT_5_MINI,
+    # AzureModels.GPT_5_3_CHAT,
+    # AzureModels.DEEPSEEK,
     AzureModels.KIMI,
-    GeminiModels.FLASH,
-    GeminiModels.LIGHT,
-    GeminiModels.PRO
+    # GeminiModels.FLASH,
+    # GeminiModels.LIGHT,
+    # GeminiModels.PRO
 ]
 
 def spawn_obstacles(sim):
@@ -83,13 +83,13 @@ def main():
         #     + "Turn around until you are facing your starting position again.",
         #     SolutionBackForth(),
         #     output_dir="Back_forth"),
-        Task("Find a red object and touch it. "
-            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-             SolutionTouchRed(),
-            output_dir="Touch_Red_object"),
-        # Task("Walk around the green object. "
+        # Task("Find a red object and touch it. "
         #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
-        #     output_dir="Circle_green"),
+        #      SolutionTouchRed(),
+        #     output_dir="Touch_Red_object"),
+        Task("Walk around the green object. "
+            + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
+            output_dir="Circle_green"),
         # Task("Walk around each of the objects. "
         #     + f"The following objects are in your vicinity:\n {sim.get_bodies(r2d2)}",
         #     output_dir="Circle_all")
@@ -121,7 +121,6 @@ def main():
                 sim.reset_objects()
 
                 print(task)
-                sim.sleep(2)
                 run = ExperimentRun()
 
                 intermediate_task = task
@@ -245,7 +244,7 @@ def main():
                         if comment != "": run.add_comment(comment)
                 setup.record_run(run)
 
-            sim.sleep(3)
+            sim.sleep(1)
             sim.recording.save_prompts(operator)
             setup.write_to_file(f"{sim.recording.output_dir}/summary.jsonl")
 

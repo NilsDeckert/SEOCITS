@@ -30,7 +30,7 @@
 #let ml_bf = paths_bf.map(p => get-file-metrics(p).at("median-latency"))
 
 // TOUCH RED
-#let paths_tred = (
+#let paths_rd = (
   "/benchmark/gpt-5-mini/Touch_Red_object/2026-06-01_22-01-00/summary.jsonl",
   "/benchmark/gpt-5.3-chat/Touch_Red_object/2026-06-01_22-01-00/summary.jsonl",
   "/benchmark/DeepSeek-V3.2/Touch_Red_object/2026-06-01_22-01-00/summary.jsonl",
@@ -39,5 +39,15 @@
   "/benchmark/gemini-3.5-flash/Touch_Red_object/2026-06-01_22-01-00/summary.jsonl",
   "/benchmark/gemini-3.1-flash-lite/Touch_Red_object/2026-06-01_22-01-00/summary.jsonl",
 )
-#let srs_tred = paths_tred.map(p => get-file-metrics(p).at("success-rate"))
-#let ml_tred = paths_tred.map(p => get-file-metrics(p).at("median-latency"))
+#let srs_rd = paths_rd.map(p => get-file-metrics(p).at("success-rate"))
+#let ml_rd = paths_rd.map(p => get-file-metrics(p).at("median-latency"))
+
+// CIRCLE GREEN
+#let paths_cg = (
+  "/benchmark/gpt-5-mini/Circle_green/2026-06-02_21-34-02/summary.jsonl",
+  "/benchmark/gpt-5.3-chat/Circle_green/2026-06-02_21-57-05/summary.jsonl",
+  "/benchmark/DeepSeek-V3.2/Circle_green/2026-06-05_17-14-34/summary.jsonl",
+  "/benchmark/Kimi-K2.5/Circle_green/2026-06-06_15-04-35/summary.jsonl",
+)
+#let srs_cg = paths_cg.map(p => get-file-metrics(p).at("success-rate"))
+#let ml_cg = paths_cg.map(p => get-file-metrics(p).at("median-latency"))

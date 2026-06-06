@@ -18,11 +18,14 @@ class Simulation:
     purple = [1, 0, 1, 1]
     cyan = [0, 1, 1, 1]
 
+    time_steps = 120.
+
     """Wraps the PyBullet environment setup."""
     def __init__(self):
         self.physicsClient = p.connect(p.GUI)
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.setGravity(0, 0, -9.81)
+        p.setTimeStep(1. / self.time_steps)
         self.planeId = p.loadURDF("plane.urdf")
         self.bodies = []
         self._set_camera()
@@ -42,10 +45,10 @@ class Simulation:
 
     def sleep(self, seconds):
         """Idle the simulation for a set amount of time without freezing the GUI."""
-        steps = int(seconds * 240)
+        steps = int(seconds * self.time_steps)
         for _ in range(steps):
             p.stepSimulation()
-            time.sleep(1.0 / 240.0)
+            time.sleep(1.0 / self.time_steps)
             
     def disconnect(self):
         """

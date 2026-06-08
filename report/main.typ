@@ -73,7 +73,7 @@ In order to test the LLMs reasoning capabilites using relative coordinates, the 
       [*Short*],
       [*Description*]
     ),
-    [#s_TL],[Turn left 90 degrees],
+    [#s_TL],[Turn left 90 degrees]
     [#s_TR],[Turn right 90 degrees],
     [#s_BF],[Walk 3 meters forward, then turn around and walk back to you original position. Turn around until you are facing your starting position again.],
     [#s_RD],[Find a red object and touch it.],
@@ -84,7 +84,7 @@ In order to test the LLMs reasoning capabilites using relative coordinates, the 
 
 == Robot API
 
-To solve the tasks described in @tasks, the LLM is given API descriptions of the following commands:
+To solve the tasks described in @tasks, the LLM is given API descriptions of the following commands to control the robot:
 
 - `move_forward(distance_in_meters)`
 - `turn_left(angle in degrees)`
@@ -155,42 +155,11 @@ NOTE: Gemini Flash made left turns around green object. All (?) other (non-gemin
   caption: "Success rate per model per task"
 )<tab_succ_gemini>
 
-#figure(
-  table(
-    columns: (auto, auto, auto, auto, auto),
-    table.header(
-      [*Task*],
-      [*GPT 5 Mini*],
-      [*GPT 5.3 Chat*],
-      [*Deepseek*],
-      [*Kimi K2*],
-    ),
-    [#s_TL],[#ml_tl.at(0)],[#ml_tl.at(1)],[#ml_tl.at(2)],[#ml_tl.at(3)],
-    [#s_TR],[#ml_tr.at(0)],[#ml_tr.at(1)],[#ml_tr.at(2)],[#ml_tr.at(3)],
-    [#s_BF],[#ml_bf.at(0)],[#ml_bf.at(1)],[#ml_bf.at(2)],[#ml_bf.at(3)],
-    [#s_RD],[#ml_rd.at(0)],[#ml_rd.at(1)],[#ml_rd.at(2)],[#ml_rd.at(3)],
-    [#s_CG],[#ml_cg.at(0)],[#ml_cg.at(1)],[#ml_cg.at(2)],[#ml_cg.at(3)],
-  ),
-  caption: "Median latency per model per task"
-)<tab_lat_gpt>
+@fig_boxplot shows the latency over all tasks for each model
 
 #figure(
-  table(
-    columns: (auto, auto, auto, auto),
-    table.header(
-      [*Task*],
-      [*Gemini 3.5 Flash Lite*],
-      [*Gemini 3.5 Flash*],
-      [*Gemini 3.1 Pro*],
-    ),
-    [#s_TL],[#ml_tl.at(4)],[#ml_tl.at(5)],[#ml_tl.at(6)],
-    [#s_TR],[#ml_tr.at(4)],[#ml_tr.at(5)],[#ml_tr.at(6)],
-    [#s_BF],[#ml_bf.at(4)],[#ml_bf.at(5)],[#ml_bf.at(6)],
-    [#s_RD],[#ml_rd.at(4)],[#ml_rd.at(5)],[#ml_rd.at(6)],
-    [#s_CG],[#ml_cg.at(4)],[#ml_cg.at(5)],[#ml_cg.at(6)],
-  ),
-  caption: "Median latency per model per task"
-)<tab_lat_gemini>
+  image("images/boxplot.png")
+)<fig_boxplot>
 
 = Discussion
 

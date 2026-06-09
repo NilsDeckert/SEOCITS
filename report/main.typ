@@ -18,15 +18,34 @@ From Global Coordinates to Robot-Centered Spatial Representations for Quadruped 
   figure-supplement: [Fig.],
 )
 
+#let red(txt) = { text(txt, fill: color.red, weight: "bold") }
+#let citation_needed = red("[CITATION NEEDED]")
+
 = Introduction
 
 Recent advances in large language models have enabled developers to leverage artificial intelligence for numerous tasks, without requiring training of specialized models.
 One example is the control of robots using large language models to solve natural language tasks in unknown environments.
 
+#linebreak()
+Traditionally, machine learning models that were used to control robots required large amounts of specialized training data #citation_needed.
+
+Vision Language Models (VLMs) combine Large Language Models (LLMs) like Llama2 @touvronLlama2Open2023 or Gemma @teamGemmaOpenModels2024 with #red("vision encoders") like SigLIP @zhaiSigmoidLossLanguage2023 or CLIP #red("???") @radfordLearningTransferableVisual2021.
+One such example is PaliGemma @beyerPaliGemmaVersatile3B2024, that can be used to for image classification or answering natural language questions about images @beyerPaliGemmaVersatile3B2024.
+
+An extension of VLMs for the use in robot control are Vision Language Action Models (VLAs) like RT-2 @brohanRT2VisionLanguageActionModels2023, OpenVLA @kimOpenVLAOpenSourceVisionLanguageAction2024 or SmolVLA @shukorSmolVLAVisionLanguageActionModel2025.
+VLAs build on-top of VLMs and directly output robot control actions expressed as text tokens @brohanRT2VisionLanguageActionModels2023.
+This way, VLAs can leverage the 'internet-scale' training data of LLMs to generate robot controls to fulfill natural language goals @kimOpenVLAOpenSourceVisionLanguageAction2024.
+
+In related work, perfect localization #footnote(cite(<HabitatChallenge2022>, form: "full")) @cartillierSemanticMapNetBuilding2021 or perfect control @henriquesMapNetAllocentricSpatial2018 of the robot are often assumed @raychaudhuriSemanticMappingIndoor2025.
+While perfect actuation of the robot is more feasible, none the of these assumption is realistic in real-world scenarios.
+Localization via Global Navigation Satellite Systems (e.g. GPS) can not be guaranteed for e.g. indoor environments and even under open sky, consumer devices only have an accuracy of up to 4.9 meters #footnote(cite(<HowYouMeasure2025>, form: "full")).
+Depending on ground conditions and incline, perfect actuation also cannot be assumed.
+
+With this work, we investigate the feasibility of using relative coordinates for robot navigation tasks through Large Language Models. To avoid the need for task or robot specific models, we utilize general-purpose LLMs hosted on remote hardware.
 
 = Methods
 
-To assess the viability of relative coordinates for the use in robot navigation, we setup a series of benchmarking tasks.
+To assess the viability of relative coordinates for the use in robot navigation, we setup a series of benchmarking tasks. The tasks are ordered in the order of approximate complexity and are executed by multiple Large Language Models to abstract per-models specifics.
 
 == Environment
 
@@ -38,6 +57,11 @@ Each object has the same dimensions and both the robot and the objects are posit
   image("./images/SimEnvironment.png"),
   caption: "The simulation environment"
 )<fig_sim_env>
+
+== Simplifications
+
+In order to focus on the evaluation of relative coordinates, we assume a number of simplifications.
+First, we abstract necessary sensor readings like LiDAR and provide the model with processed data derived from our known state of the simulated environment.
 
 Along with each task, the large language model is given a description of its environment using relative coordinates.
 @code_environment shows an example giving a description for one of the objects.
@@ -64,7 +88,10 @@ Along with each task, the large language model is given a description of its env
 #let s_CG = "Circle Green"
 #let s_CA = "Circle All"
 
-In order to test the LLMs reasoning capabilites using relative coordinates, the model is tested on multiple tasks with increasing complexity. @tab_tasks lists the benchmarked tasks.
+In order to test the LLMs reasoning capabilites using relative coordinates, the model is tested on multiple tasks with approximately increasing complexity. @tab_tasks lists the benchmarked tasks.
+Tasks 1-3 are meant to ensure that the model is capable of the basic controls necessary to complete more complex tasks.
+Task 4 requires 'understanding' of the simplified sensor readings and the deduced environment.
+Finally, Task 5 combines the requirements necessary for the prior tasks and demands 'understanding' of the location changes caused by the robots movements.
 
 #figure(
   table(
@@ -73,7 +100,7 @@ In order to test the LLMs reasoning capabilites using relative coordinates, the 
       [*Short*],
       [*Description*]
     ),
-    [#s_TL],[Turn left 90 degrees]
+    [#s_TL],[Turn left 90 degrees],
     [#s_TR],[Turn right 90 degrees],
     [#s_BF],[Walk 3 meters forward, then turn around and walk back to you original position. Turn around until you are facing your starting position again.],
     [#s_RD],[Find a red object and touch it.],
@@ -81,6 +108,11 @@ In order to test the LLMs reasoning capabilites using relative coordinates, the 
   ),
   caption: "Summary of the benchmarked tasks"
 )<tab_tasks>
+
+To assess the success rate of a model for a given task, each task is executed 20 times by each model.
+The completion of tasks 1-3 is evaluated programatically while tasks 4-5 are judged manually.
+
+As the inference speed of the employed models is highly relevant for real-world usecases, we also record the time from task input to control output for every task execution.
 
 == Robot API
 
@@ -90,6 +122,7 @@ To solve the tasks described in @tasks, the LLM is given API descriptions of the
 - `turn_left(angle in degrees)`
 - `turn_right(angle in degrees)`
 
+The model is instructed to only return a combination of the given commands.
 The LLMs output is then parsed for the described commands. Recognised calls are executed, while misformed calls and comments are ignored.
 
 #linebreak()
@@ -114,7 +147,11 @@ The following Large Language Models are tested:
 
 Each task was executed 20 times. @tab_succ_gpt and @tab_succ_gemini show the success rates of each model for each task.
 The tasks #s_TL, #s_TR and #s_BF were sucessfully solved by all models on every try. 
-The task #s_RD was solved with 100% success rate by all models except Deepseek, which touched the green object instead of the required red one.
+The task #s_RD was solved with 100% success rate by all models except Deepseek, which touched the green object instead of the required red one once.
+
+Notably, the last task of circling the green object shows a sudden drop in success rate for all tested models.
+The models `GPT 5 Mini` and `Deepseek` showed the best success rate, successfully circling the green object 9 out of 20 times. Though only with a margin of one run compared to `GPT 5.3 Chat`, `Kimi K2` and `Gemini 3.5 Flash`.
+The two Gemini models `3.5 Flash Lite` and `3.1 Pro` performed worst, only succeeding 6/20 and 5/20 times respectively.
 
 #figure(
   table(

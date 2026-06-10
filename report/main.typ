@@ -49,7 +49,7 @@ To assess the viability of relative coordinates for the use in robot navigation,
 
 == Environment
 
-The test environment is a PyBullet#footnote(link("https://pybullet.org/")) simulation consisting of 3 colored cubes and a controllable robot.
+The test environment is a PyBullet#footnote(link("https://pybullet.org/")) simulation consisting of 3 colored cubes and a controllable robot in an open setting.
 For each run, the environment is reset so that the robot is placed in the center of the objects around it.
 Each object has the same dimensions and both the robot and the objects are positioned on the same plane. @fig_sim_env shows the arrangement of the simulation environment.
 
@@ -63,7 +63,7 @@ Each object has the same dimensions and both the robot and the objects are posit
 In order to focus on the evaluation of relative coordinates, we assume a number of simplifications.
 First, we abstract necessary sensor readings like LiDAR and provide the model with processed data derived from our known state of the simulated environment.
 
-Along with each task, the large language model is given a description of its environment using relative coordinates.
+Along with each task, the Large Language Model is given a description of its environment using relative coordinates.
 @code_environment shows an example giving a description for one of the objects.
 
 #figure(
@@ -77,6 +77,8 @@ Along with each task, the large language model is given a description of its env
   ```,
   caption: "Information given to the model to describe the location of a green cube to the front-right"
 )<code_environment>
+
+To focus on the navigation of the robot, we also keep the environment very minimal and only formulate the tasks in regard to the color of the objects. Thus, we do not test the identification of specific items.
 
 == Tasks<tasks>
 
@@ -145,7 +147,11 @@ The following Large Language Models are tested:
 
 = Results
 
-Each task was executed 20 times. @tab_succ_gpt and @tab_succ_gemini show the success rates of each model for each task.
+Each task was executed 20 times.
+
+== Success Rate
+
+@tab_succ_gpt and @tab_succ_gemini show the success rates of each model for each task.
 The tasks #s_TL, #s_TR and #s_BF were sucessfully solved by all models on every try. 
 The task #s_RD was solved with 100% success rate by all models except Deepseek, which touched the green object instead of the required red one once.
 
@@ -172,7 +178,7 @@ The two Gemini models `3.5 Flash Lite` and `3.1 Pro` performed worst, only succe
   caption: "Success rate per model per task"
 )<tab_succ_gpt>
 
-NOTE: Gemini Flash made left turns around green object. All (?) other (non-gemini) models made right turns (like in example)
+#red("NOTE:") Gemini Flash made left turns around green object. All (?) other (non-gemini) models made right turns (like in example)
 
 #figure(
   table(
@@ -192,12 +198,66 @@ NOTE: Gemini Flash made left turns around green object. All (?) other (non-gemin
   caption: "Success rate per model per task"
 )<tab_succ_gemini>
 
-@fig_boxplot shows the latency over all tasks for each model
+== Latency
+
+@tab_lat shows the latency per model for each task.
+The recorded latencies for the tasks "#s_TL" and "#s_TR" are very similar.
+The latency for the "#s_RD" task is slightly higher and the tasks "#s_BF" and "#s_CG" showed the highest latency.
+
 
 #figure(
-  image("images/boxplot.png")
-)<fig_boxplot>
+  table(
+    columns: (auto, auto, auto, auto, auto, auto),
+    table.header(
+      [*Model*],
+      [#s_TL (s)],
+      [#s_TR (s)],
+      [#s_BF (s)],
+      [#s_RD (s)],
+      [#s_CG (s)],
+    ),
+    [*GPT 5 Mini*], [#ml_tl.at(0)], [#ml_tr.at(0)],
+    [#ml_bf.at(0)], [#ml_rd.at(0)], [#ml_cg.at(0)],
+
+    [*GPT 5.3 Chat*], [#ml_tl.at(1)], [#ml_tr.at(1)],
+    [#ml_bf.at(1)], [#ml_rd.at(1)], [#ml_cg.at(1)],
+
+    [*Deepseek*], [#ml_tl.at(2)], [#ml_tr.at(2)],
+    [#ml_bf.at(2)], [#ml_rd.at(2)], [#ml_cg.at(2)],
+
+    [*Kimi K2*], [#ml_tl.at(3)], [#ml_tr.at(3)],
+    [#ml_bf.at(3)], [#ml_rd.at(3)], [#ml_cg.at(3)],
+
+    [*Gemini 3.5 Flash Lite*], [#ml_tl.at(4)], [#ml_tr.at(4)],
+    [#ml_bf.at(4)], [#ml_rd.at(4)], [#ml_cg.at(4)],
+
+    [*Gemini 3.5 Flash*], [#ml_tl.at(5)], [#ml_tr.at(5)],
+    [#ml_bf.at(5)], [#ml_rd.at(5)], [#ml_cg.at(5)],
+
+    [*Gemini 3.1 Pro*], [#ml_tl.at(6)], [#ml_tr.at(6)],
+    [#ml_bf.at(6)], [#ml_rd.at(6)], [#ml_cg.at(6)],
+  ),
+  caption: "Median latency per model per task"
+)<tab_lat>
+
+@fig_boxplot_turn_left visualizes the latency per model for the Task #s_TL.
+For comparison, @fig_boxplot_circle_green shows the same plot for the #s_CG task.
+
+#figure(
+  image("images/boxplot_Turn_left_90.png")
+)<fig_boxplot_turn_left>
+
+#figure(
+  image("images/boxplot_Circle_green.png")
+)<fig_boxplot_circle_green>
 
 = Discussion
+
+== Success Rate
+
+== Latency
+
+@tab_lat shows that the required inference time does not scale with out perceived complexity of the tasks, but rather the required number of commands to complete the task.
+For example, the completion of the task "#s_BF" (4 commands in optimal solution) took significantly longer than that of the "#s_RD" task (2 commands in optimal solution).
 
 = Conclusion

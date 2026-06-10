@@ -1,3 +1,4 @@
+#import "color_ratio.typ": *
 // This file was entirely written by Gemini
 
 // Helper: Calculate Success Rate from an array of runs
@@ -105,8 +106,10 @@
   let results = (:)
   for (task, runs) in tasks.pairs() {
 
-    results.insert("success-rate", calc-success-rate(runs))
-    results.insert("median-latency", calc-median-latency(runs))
+    results.insert("success-rate",
+      color-ratio(calc-success-rate(runs)))
+    results.insert("median-latency",
+      color-latency(calc-median-latency(runs)))
   }
   return results
 }

@@ -43,7 +43,7 @@ Depending on ground conditions and incline, perfect actuation also cannot be ass
 
 With this work, we investigate the feasibility of using relative coordinates for robot navigation tasks through Large Language Models. To avoid the need for task or robot specific models, we utilize general-purpose LLMs hosted on remote hardware.
 
-= Methods
+= Experiments
 
 To assess the viability of relative coordinates for the use in robot navigation, we setup a series of benchmarking tasks. The tasks are ordered in the order of approximate complexity and are executed by multiple Large Language Models to abstract per-models specifics.
 
@@ -111,10 +111,16 @@ Finally, Task 5 combines the requirements necessary for the prior tasks and dema
   caption: "Summary of the benchmarked tasks"
 )<tab_tasks>
 
+
+= Methods
+
 To assess the success rate of a model for a given task, each task is executed 20 times by each model.
 The completion of tasks 1-3 is evaluated programatically while tasks 4-5 are judged manually.
 
 As the inference speed of the employed models is highly relevant for real-world usecases, we also record the time from task input to control output for every task execution.
+
+To be able to judge the suitability of relative coordinate in the use of robot navigation, we first collect a baseline using absolute coordinates.
+For this, we execute the "#s_CG" with the Gemini 3.1 Pro model 20 times, giving absolute coordinates for the robots and objects position.
 
 == Robot API
 
@@ -148,61 +154,49 @@ The following Large Language Models are tested:
 = Results
 
 Each task was executed 20 times.
+As a baseline, we first executed the "#s_CG" task using absolute coordinates with the Gemini 3.1 Pro model.
+For this task, the model achieved a 100% success rate with a median latency of #red("???") seconds.
 
 == Success Rate
 
-@tab_succ_gpt and @tab_succ_gemini show the success rates of each model for each task.
-The tasks #s_TL, #s_TR and #s_BF were sucessfully solved by all models on every try. 
-The task #s_RD was solved with 100% success rate by all models except Deepseek, which touched the green object instead of the required red one once.
+@tab_succ shows the success rates of each model for each task.
+The tasks "#s_TL", "#s_TR" and "#s_BF" were sucessfully solved by all models on every try. 
+The task "#s_RD" was solved with 100% success rate by all models except DeepSeek, which touched the green instead of the required red object once.
 
 Notably, the last task of circling the green object shows a sudden drop in success rate for all tested models.
-The models `GPT 5 Mini` and `Deepseek` showed the best success rate, successfully circling the green object 9 out of 20 times. Though only with a margin of one run compared to `GPT 5.3 Chat`, `Kimi K2` and `Gemini 3.5 Flash`.
+The models `GPT 5 Mini` and `DeepSeek` showed the best success rate, successfully circling the green object 9 out of 20 times. Though only with a margin of one run compared to `GPT 5.3 Chat`, `Kimi K2` and `Gemini 3.5 Flash`.
 The two Gemini models `3.5 Flash Lite` and `3.1 Pro` performed worst, only succeeding 6/20 and 5/20 times respectively.
 
 #figure(
   table(
-    columns: (auto, auto, auto, auto, auto),
+    columns: (auto, auto, auto, auto, auto, auto),
     table.header(
-      [*Task*],
-      [*GPT 5 Mini*],
-      [*GPT 5.3 Chat*],
-      [*Deepseek*],
-      [*Kimi K2*],
+      [*Model*],
+      [#s_TL],
+      [#s_TR],
+      [#s_BF],
+      [#s_RD],
+      [#s_CG],
     ),
-    [#s_TL],[#srs_tl.at(0)],[#srs_tl.at(1)],[#srs_tl.at(2)],[#srs_tl.at(3)],
-    [#s_TR],[#srs_tr.at(0)],[#srs_tr.at(1)],[#srs_tr.at(2)],[#srs_tr.at(3)],
-    [#s_BF],[#srs_bf.at(0)],[#srs_bf.at(1)],[#srs_bf.at(2)],[#srs_bf.at(3)],
-    [#s_RD],[#srs_rd.at(0)],[#srs_rd.at(1)],[#srs_rd.at(2)],[#srs_rd.at(3)],
-    [#s_CG],[#srs_cg.at(0)],[#srs_cg.at(1)],[#srs_cg.at(2)],[#srs_cg.at(3)],
+    [*GPT 5 Mini*], [#srs_tl.at(0)], [#srs_tr.at(0)], [#srs_bf.at(0)], [#srs_rd.at(0)], [#srs_cg.at(0)],
+    [*GPT 5.3 Chat*], [#srs_tl.at(1)], [#srs_tr.at(1)], [#srs_bf.at(1)], [#srs_rd.at(1)], [#srs_cg.at(1)],
+    [*Deepseek*], [#srs_tl.at(2)], [#srs_tr.at(2)], [#srs_bf.at(2)], [#srs_rd.at(2)], [#srs_cg.at(2)],
+    [*Kimi K2*], [#srs_tl.at(3)], [#srs_tr.at(3)], [#srs_bf.at(3)], [#srs_rd.at(3)], [#srs_cg.at(3)],
+    [*Gemini 3.5 Flash Lite*], [#srs_tl.at(4)], [#srs_tr.at(4)], [#srs_bf.at(4)], [#srs_rd.at(4)], [#srs_cg.at(4)],
+    [*Gemini 3.5 Flash*], [#srs_tl.at(5)], [#srs_tr.at(5)], [#srs_bf.at(5)], [#srs_rd.at(5)], [#srs_cg.at(5)],
+    [*Gemini 3.1 Pro*], [#srs_tl.at(6)], [#srs_tr.at(6)], [#srs_bf.at(6)], [#srs_rd.at(6)], [#srs_cg.at(6)],
   ),
   caption: "Success rate per model per task"
-)<tab_succ_gpt>
+)<tab_succ>
 
 #red("NOTE:") Gemini Flash made left turns around green object. All (?) other (non-gemini) models made right turns (like in example)
 
-#figure(
-  table(
-    columns: (auto, auto, auto, auto),
-    table.header(
-      [*Task*],
-      [*Gemini 3.5 Flash Lite*],
-      [*Gemini 3.5 Flash*],
-      [*Gemini 3.1 Pro*],
-    ),
-    [#s_TL],[#srs_tl.at(4)],[#srs_tl.at(5)],[#srs_tl.at(6)],
-    [#s_TR],[#srs_tr.at(4)],[#srs_tr.at(5)],[#srs_tr.at(6)],
-    [#s_BF],[#srs_bf.at(4)],[#srs_bf.at(5)],[#srs_bf.at(6)],
-    [#s_RD],[#srs_rd.at(4)],[#srs_rd.at(5)],[#srs_rd.at(6)],
-    [#s_CG],[#srs_cg.at(4)],[#srs_cg.at(5)],[#srs_cg.at(6)],
-  ),
-  caption: "Success rate per model per task"
-)<tab_succ_gemini>
-
 == Latency
 
-@tab_lat shows the latency per model for each task.
-The recorded latencies for the tasks "#s_TL" and "#s_TR" are very similar.
-The latency for the "#s_RD" task is slightly higher and the tasks "#s_BF" and "#s_CG" showed the highest latency.
+@tab_lat shows the median latency per model for each task.
+The recorded latencies for the tasks "#s_TL" and "#s_TR" are very similar, with a maximum difference of $0.59s$ ($~15%$) for the DeepSeek model.
+The latency for the "#s_RD" task is slightly higher than that of the first two tasks.
+The task "#s_BF" shows another increase in latency and "#s_CG" showed the highest median latency across models.
 
 
 #figure(
@@ -254,6 +248,11 @@ For comparison, @fig_boxplot_circle_green shows the same plot for the #s_CG task
 = Discussion
 
 == Success Rate
+
+The results of the first tasks seem very promising and show that the Large Language Models are capable of basic robot control and understanding of the environment.
+Nevertheless, none of the tested models were able to solve the "#s_CG" task reliably and even in the best cases only succeeded 45% of the time.
+
+The results suggest, that the use of relative coordinates is not suitable for navigation of unspecialized Large Language Models.
 
 == Latency
 

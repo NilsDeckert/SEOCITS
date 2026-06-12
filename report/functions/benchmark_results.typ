@@ -13,6 +13,11 @@
 // Create a list of all .jsonl files per task
 // Not all benchmarks where done at once
 
+// BASE LINE.
+#let path_baseline = "/benchmark/gemini-3.1-pro-preview/Circle_green/2026-06-10_16-42-16/summary.jsonl"
+#let srs_baseline = get-file-metrics(path_baseline).at("success-rate")
+#let ml_baseline = get-file-metrics(path_baseline).at("median-latency")
+
 // TURN LEFT
 #let date1 = "2026-06-01_20-39-59"
 #let paths_tl = models.map(m => "/benchmark/"+m+"/Turn_left_90/"+date1+"/summary.jsonl")

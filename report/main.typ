@@ -3,7 +3,7 @@
 
 #show: ieee.with(
   title: [
-From Global Coordinates to Robot-Centered Spatial Representations for Quadruped Robots],
+From Global Coordinates to Robot-Centered Spatial Representations],
   abstract: [
     The process of scientific writing is often tangled up with the intricacies of typesetting, leading to frustration and wasted time for researchers. In this paper, we introduce Typst, a new typesetting system designed specifically for scientific writing. Typst untangles the typesetting process, allowing researchers to compose papers faster. In a series of experiments we demonstrate that Typst offers several advantages, including faster document creation, simplified syntax, and increased ease-of-use.
   ],
@@ -23,18 +23,19 @@ From Global Coordinates to Robot-Centered Spatial Representations for Quadruped 
 
 = Introduction
 
-Recent advances in large language models have enabled developers to leverage artificial intelligence for numerous tasks, without requiring training of specialized models.
-One example is the control of robots using large language models to solve natural language tasks in unknown environments.
+Recent advances in Large Language Models have enabled developers to leverage artificial intelligence for numerous tasks, without requiring training of specialized models.
 
 #linebreak()
 Traditionally, machine learning models that were used to control robots required large amounts of specialized training data #citation_needed.
 
-Vision Language Models (VLMs) combine Large Language Models (LLMs) like Llama2 @touvronLlama2Open2023 or Gemma @teamGemmaOpenModels2024 with #red("vision encoders") like SigLIP @zhaiSigmoidLossLanguage2023 or CLIP #red("???") @radfordLearningTransferableVisual2021.
-One such example is PaliGemma @beyerPaliGemmaVersatile3B2024, that can be used to for image classification or answering natural language questions about images @beyerPaliGemmaVersatile3B2024.
+Vision Language Models (VLMs) like PaliGemma @beyerPaliGemmaVersatile3B2024 combine Large Language Models (LLMs) like Llama2 @touvronLlama2Open2023 or Gemma @teamGemmaOpenModels2024 with #red("vision encoders") like SigLIP @zhaiSigmoidLossLanguage2023 or CLIP #red("???") @radfordLearningTransferableVisual2021 for tasks like image classification or answering natural language questions about images @beyerPaliGemmaVersatile3B2024.
 
 An extension of VLMs for the use in robot control are Vision Language Action Models (VLAs) like RT-2 @brohanRT2VisionLanguageActionModels2023, OpenVLA @kimOpenVLAOpenSourceVisionLanguageAction2024 or SmolVLA @shukorSmolVLAVisionLanguageActionModel2025.
 VLAs build on-top of VLMs and directly output robot control actions expressed as text tokens @brohanRT2VisionLanguageActionModels2023.
 This way, VLAs can leverage the 'internet-scale' training data of LLMs to generate robot controls to fulfill natural language goals @kimOpenVLAOpenSourceVisionLanguageAction2024.
+Still, VLAs require specific training and finetuning and are thus less accessible to developers than conventional Large Language Models.
+
+For this reason, we are investigating the use of regular Large Language Models to generate robot control commands without specialized commands.
 
 In related work, perfect localization #footnote(cite(<HabitatChallenge2022>, form: "full")) @cartillierSemanticMapNetBuilding2021 or perfect control @henriquesMapNetAllocentricSpatial2018 of the robot are often assumed @raychaudhuriSemanticMappingIndoor2025.
 While perfect actuation of the robot is more feasible, none the of these assumption is realistic in real-world scenarios.
@@ -46,6 +47,7 @@ With this work, we investigate the feasibility of using relative coordinates for
 = Experiments
 
 To assess the viability of relative coordinates for the use in robot navigation, we setup a series of benchmarking tasks. The tasks are ordered in the order of approximate complexity and are executed by multiple Large Language Models to abstract per-models specifics.
+To ensure suitability of absolute coordinates and to provide a comparison between absolute and relative coordinates, we first execute the _most complex_ task with one of the LLMs to get a baseline.
 
 == Environment
 
@@ -78,7 +80,9 @@ Along with each task, the Large Language Model is given a description of its env
   caption: "Information given to the model to describe the location of a green cube to the front-right"
 )<code_environment>
 
-To focus on the navigation of the robot, we also keep the environment very minimal and only formulate the tasks in regard to the color of the objects. Thus, we do not test the identification of specific items.
+To focus on the navigation of the robot, we also keep the environment very minimal and only formulate the tasks in regard to the color of the objects. Thus, we do not test the identification of specific items. Furthermore, all objects and the robot are located on the same, two dimensional plane, abstracting differences in elevation.
+
+Because of the relatively simple nature of the tasks, the Large Language Models are given their initial task and sensor readings from the start of the robots position. The tasks are to be solved in a one-shot procedure, avoiding reprompting during the simulation.
 
 == Tasks<tasks>
 
@@ -119,6 +123,8 @@ The completion of tasks 1-3 is evaluated programatically while tasks 4-5 are jud
 
 As the inference speed of the employed models is highly relevant for real-world usecases, we also record the time from task input to control output for every task execution.
 
+#linebreak()
+
 To be able to judge the suitability of relative coordinate in the use of robot navigation, we first collect a baseline using absolute coordinates.
 For this, we execute the "#s_CG" with the Gemini 3.1 Pro model 20 times, giving absolute coordinates for the robots and objects position.
 
@@ -155,7 +161,7 @@ The following Large Language Models are tested:
 
 Each task was executed 20 times.
 As a baseline, we first executed the "#s_CG" task using absolute coordinates with the Gemini 3.1 Pro model.
-For this task, the model achieved a 100% success rate with a median latency of #red("???") seconds.
+For this task, the model achieved a 100% success rate with a median latency of #ml_baseline seconds.
 
 == Success Rate
 
@@ -188,8 +194,6 @@ The two Gemini models `3.5 Flash Lite` and `3.1 Pro` performed worst, only succe
   ),
   caption: "Success rate per model per task"
 )<tab_succ>
-
-#red("NOTE:") Gemini Flash made left turns around green object. All (?) other (non-gemini) models made right turns (like in example)
 
 == Latency
 
@@ -252,7 +256,9 @@ For comparison, @fig_boxplot_circle_green shows the same plot for the #s_CG task
 The results of the first tasks seem very promising and show that the Large Language Models are capable of basic robot control and understanding of the environment.
 Nevertheless, none of the tested models were able to solve the "#s_CG" task reliably and even in the best cases only succeeded 45% of the time.
 
-The results suggest, that the use of relative coordinates is not suitable for navigation of unspecialized Large Language Models.
+While the baseline shows that the Large Language Model itself is capable of controlling the robot satisfactorily, the results suggest that the use of relative coordinates is not suitable for navigation of unspecialized Large Language Models.
+
+Looking at the problems / mistakes that occured during the experiments, the models most commonly "turned too far"
 
 == Latency
 

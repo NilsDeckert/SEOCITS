@@ -36,6 +36,8 @@ if __name__ == "__main__":
 
     print(f"Scanning directory: {args.directory}\n")
     counts = count_comments(args.directory)
+
+    
     
     # Display the results
     if not counts:
@@ -43,6 +45,11 @@ if __name__ == "__main__":
     else:
         print(f"{'Count':<10} | {'Comment'}")
         print("-" * 50)
+        total = 0
         # .most_common() returns a list sorted by count in descending order
         for comment, count in counts.most_common():
             print(f"{count:<10} | {comment}")
+            total += count
+
+        print("------")
+        print(f"Total: {total}")

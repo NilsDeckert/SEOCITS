@@ -23,26 +23,33 @@ From Global Coordinates to Robot-Centered Spatial Representations],
 
 = Introduction
 
-Recent advances in Large Language Models have enabled developers to leverage artificial intelligence for numerous tasks, without requiring training of specialized models.
+Up until recently, machine learning models for robotic control were highly specialized and required massive datasets for domain-specific tasks #red("[X]"). Recent advances in Large Language Models however, have enabled developers to leverage artificial intelligence for broad, open-ended tasks, without requiring training of specialized models.
 
 #linebreak()
-Traditionally, machine learning models that were used to control robots required large amounts of specialized training data #citation_needed.
 
-Vision Language Models (VLMs) like PaliGemma @beyerPaliGemmaVersatile3B2024 combine Large Language Models (LLMs) like Llama2 @touvronLlama2Open2023 or Gemma @teamGemmaOpenModels2024 with #red("vision encoders") like SigLIP @zhaiSigmoidLossLanguage2023 or CLIP #red("???") @radfordLearningTransferableVisual2021 for tasks like image classification or answering natural language questions about images @beyerPaliGemmaVersatile3B2024.
+In the chain of reasoning about and acting inside unknown, physical environments, Vision Language Models (VLMs) provide the first step of reasoning about the environment through visual clues. VLMs like PaliGemma @beyerPaliGemmaVersatile3B2024 combine Large Language Models (LLMs) like Llama2 @touvronLlama2Open2023 or Gemma @teamGemmaOpenModels2024 with vision encoders like SigLIP @zhaiSigmoidLossLanguage2023 or CLIP @radfordLearningTransferableVisual2021 for tasks like image classification or answering natural language questions about images @beyerPaliGemmaVersatile3B2024. Audio Vision Language Models (AVLMs) @guzhovAudioCLIPExtendingCLIP2021 @lyuMacawLLMMultiModalLanguage2023 extend VLMs with reasoning capabilites about sound cues.
 
-An extension of VLMs for the use in robot control are Vision Language Action Models (VLAs) like RT-2 @brohanRT2VisionLanguageActionModels2023, OpenVLA @kimOpenVLAOpenSourceVisionLanguageAction2024 or SmolVLA @shukorSmolVLAVisionLanguageActionModel2025.
+#linebreak()
+
+To bridge the gap from reasoning to acting, Vision Language Action Models (VLAs) like RT-2 @brohanRT2VisionLanguageActionModels2023, OpenVLA @kimOpenVLAOpenSourceVisionLanguageAction2024 or SmolVLA @shukorSmolVLAVisionLanguageActionModel2025 further extend the idea of VLMs.
 VLAs build on-top of VLMs and directly output robot control actions expressed as text tokens @brohanRT2VisionLanguageActionModels2023.
 This way, VLAs can leverage the 'internet-scale' training data of LLMs to generate robot controls to fulfill natural language goals @kimOpenVLAOpenSourceVisionLanguageAction2024.
-Still, VLAs require specific training and finetuning and are thus less accessible to developers than conventional Large Language Models.
+Still, VLAs require specific training and finetuning and are thus less accessible to developers than off-the-shelf Large Language Models.
 
-For this reason, we are investigating the use of regular Large Language Models to generate robot control commands without specialized commands.
+For this reason, we are investigating the use of regular Large Language Models to generate robot control commands without specialized models.
 
-In related work, perfect localization #footnote(cite(<HabitatChallenge2022>, form: "full")) @cartillierSemanticMapNetBuilding2021 or perfect control @henriquesMapNetAllocentricSpatial2018 of the robot are often assumed @raychaudhuriSemanticMappingIndoor2025.
-While perfect actuation of the robot is more feasible, none the of these assumption is realistic in real-world scenarios.
+#linebreak()
+
+While related work @IntentionsActionsWorkflow2026 has shown that off-the-shelf LLMs can be used for robot navigation, grounding these models in physical space remains an ongoing challenge.
+In similar work, perfect localization #footnote(cite(<HabitatChallenge2022>, form: "full")) @cartillierSemanticMapNetBuilding2021 or perfect control @henriquesMapNetAllocentricSpatial2018 of the robot are often assumed @raychaudhuriSemanticMappingIndoor2025.
+While perfect actuation of the robot is more feasible, none of these assumption are realistic in real-world scenarios:
 Localization via Global Navigation Satellite Systems (e.g. GPS) can not be guaranteed for e.g. indoor environments and even under open sky, consumer devices only have an accuracy of up to 4.9 meters #footnote(cite(<HowYouMeasure2025>, form: "full")).
 Depending on ground conditions and incline, perfect actuation also cannot be assumed.
 
-With this work, we investigate the feasibility of using relative coordinates for robot navigation tasks through Large Language Models. To avoid the need for task or robot specific models, we utilize general-purpose LLMs hosted on remote hardware.
+#linebreak()
+
+With this work, we investigate the feasibility of using relative coordinates for robot navigation tasks through off-the-shelf Large Language Models.
+We evaluate the performance of different general-purpose LLMs hosted on remote hardware and provide a comparison between them.
 
 = Experiments
 
@@ -167,7 +174,8 @@ For this task, the model achieved a 100% success rate with a median latency of #
 
 @tab_succ shows the success rates of each model for each task.
 The tasks "#s_TL", "#s_TR" and "#s_BF" were sucessfully solved by all models on every try. 
-The task "#s_RD" was solved with 100% success rate by all models except DeepSeek, which touched the green instead of the required red object once.
+The task "#s_RD" was solved with 100% success rate by `GPT 5 Mini`, `GPT 5.3 Chat` and `Kimi K2`.
+`DeepSeek` and the Gemini models `3.1 Flash Lite`, `3.1 Pro Preview` and `3.5 Flash` each touched the green instead of the required red object once.
 
 Notably, the last task of circling the green object shows a sudden drop in success rate for all tested models.
 The models `GPT 5 Mini` and `DeepSeek` showed the best success rate, successfully circling the green object 9 out of 20 times. Though only with a margin of one run compared to `GPT 5.3 Chat`, `Kimi K2` and `Gemini 3.5 Flash`.
@@ -256,9 +264,9 @@ For comparison, @fig_boxplot_circle_green shows the same plot for the #s_CG task
 The results of the first tasks seem very promising and show that the Large Language Models are capable of basic robot control and understanding of the environment.
 Nevertheless, none of the tested models were able to solve the "#s_CG" task reliably and even in the best cases only succeeded 45% of the time.
 
-While the baseline shows that the Large Language Model itself is capable of controlling the robot satisfactorily, the results suggest that the use of relative coordinates is not suitable for navigation of unspecialized Large Language Models.
+While the baseline shows that the Large Language Model itself is capable of controlling the robot satisfactorily, the results suggest that the use of relative coordinates is not suitable for navigation by unspecialized Large Language Models.
 
-Looking at the problems / mistakes that occured during the experiments, the models most commonly "turned too far"
+Looking at the problems that occured during the experiments, the models most commonly (44/91) "turned too far" i.e. away from the target object after moving into its vicinity. In 20 of 44 cases the model would have correctly chosen the turn direction afterwards, but circled in empty space following the initially described mistake. In 9 cases, it did so even after aligning correctly with the objects axis. In 18/91 cases, the model did not correctly handle the distance information it was provided and moved the target object.
 
 == Latency
 

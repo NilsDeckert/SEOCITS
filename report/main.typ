@@ -264,13 +264,22 @@ For comparison, @fig_boxplot_circle_green shows the same plot for the #s_CG task
 The results of the first tasks seem very promising and show that the Large Language Models are capable of basic robot control and understanding of the environment.
 Nevertheless, none of the tested models were able to solve the "#s_CG" task reliably and even in the best cases only succeeded 45% of the time.
 
-While the baseline shows that the Large Language Model itself is capable of controlling the robot satisfactorily, the results suggest that the use of relative coordinates is not suitable for navigation by unspecialized Large Language Models.
+Looking at the problems that occured during the experiments, the models most commonly (44/91) "turned too far" i.e. away from the target object after moving into its vicinity. In 20 of 44 cases the model would have correctly chosen the turn direction afterwards, but circled in empty space following the initially described mistake. In 9 cases, it did so even after aligning correctly with the objects axis.
+In our final experiments, we provided the model with directions in degrees, though we also tested using radian measure, which did not improve the models sense of direction.
 
-Looking at the problems that occured during the experiments, the models most commonly (44/91) "turned too far" i.e. away from the target object after moving into its vicinity. In 20 of 44 cases the model would have correctly chosen the turn direction afterwards, but circled in empty space following the initially described mistake. In 9 cases, it did so even after aligning correctly with the objects axis. In 18/91 cases, the model did not correctly handle the distance information it was provided and moved the target object.
+In 18/91 cases, the model did not correctly handle the distance information it was provided and moved the target object.
+
+#linebreak()
+
+
+While the baseline shows that the Large Language Model itself is capable of controlling the robot satisfactorily, the results suggest that the use of relative coordinates is not suitable for navigation by unspecialized Large Language Models.
 
 == Latency
 
 @tab_lat shows that the required inference time does not scale with out perceived complexity of the tasks, but rather the required number of commands to complete the task.
 For example, the completion of the task "#s_BF" (4 commands in optimal solution) took significantly longer than that of the "#s_RD" task (2 commands in optimal solution).
 
-= Conclusion
+Overall, the required inference time scaled relatively fast with an increasing number of output commands. Even though our benchmarking tasks were relatively simple, the task "#s_CG" required a median inference time of $14.31$ seconds.
+For more complex tasks that would require more control commands, this would likely increase even further. Even disregarding the success rate, the required latency could restrict acceptance in real life scenarios, depending on the use case.
+
+= Conclusion 

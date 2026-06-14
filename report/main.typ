@@ -23,7 +23,10 @@ From Global Coordinates to Robot-Centered Spatial Representations],
 
 = Introduction
 
-Up until recently, machine learning models for robotic control were highly specialized and required massive datasets for domain-specific tasks #red("[X]"). Recent advances in Large Language Models however, have enabled developers to leverage artificial intelligence for broad, open-ended tasks, without requiring training of specialized models.
+Up until recently, machine learning models for robotic control were highly specialized and required massive datasets for domain-specific tasks @dasari_robonet_2020 @ebert_bridge_2022.
+Recent advances in Large Language Models however, have enabled researchers to leverage the models 'internet-scale' training data by building on top of existing models.
+Still, reusing Large Language Models as foundation models, requires further training and finetuning for the specific field of robotic control.
+This poses the question, if the manual adaptation of models can be bypassed and modern off-the-shelf LLMs could be used for robot control directly.
 
 #linebreak()
 
@@ -153,10 +156,13 @@ The LLMs output is then parsed for the described commands. Recognised calls are 
   "GPT 5.3 Chat",
   "Deepseek",
   "Kimi K2.5",
-  "Gemini 3.5 Flash Lite",
+  "Gemini 3.1 Flash Lite",
   "Gemini 3.5 Flash",
   "Gemini 3.1 Pro",
 )
+
+#let deepseek = `DeepSeek V3.2`
+#let kimi = `Kimi K2.5`
 
 The following Large Language Models are tested:
 
@@ -179,7 +185,7 @@ The task "#s_RD" was solved with 100% success rate by `GPT 5 Mini`, `GPT 5.3 Cha
 
 Notably, the last task of circling the green object shows a sudden drop in success rate for all tested models.
 The models `GPT 5 Mini` and `DeepSeek` showed the best success rate, successfully circling the green object 9 out of 20 times. Though only with a margin of one run compared to `GPT 5.3 Chat`, `Kimi K2` and `Gemini 3.5 Flash`.
-The two Gemini models `3.5 Flash Lite` and `3.1 Pro` performed worst, only succeeding 6/20 and 5/20 times respectively.
+The two Gemini models `3.1 Flash Lite` and `3.1 Pro` performed worst, only succeeding 6/20 and 5/20 times respectively.
 
 #figure(
   table(
@@ -192,13 +198,26 @@ The two Gemini models `3.5 Flash Lite` and `3.1 Pro` performed worst, only succe
       [#s_RD],
       [#s_CG],
     ),
-    [*GPT 5 Mini*], [#srs_tl.at(0)], [#srs_tr.at(0)], [#srs_bf.at(0)], [#srs_rd.at(0)], [#srs_cg.at(0)],
-    [*GPT 5.3 Chat*], [#srs_tl.at(1)], [#srs_tr.at(1)], [#srs_bf.at(1)], [#srs_rd.at(1)], [#srs_cg.at(1)],
-    [*Deepseek*], [#srs_tl.at(2)], [#srs_tr.at(2)], [#srs_bf.at(2)], [#srs_rd.at(2)], [#srs_cg.at(2)],
-    [*Kimi K2*], [#srs_tl.at(3)], [#srs_tr.at(3)], [#srs_bf.at(3)], [#srs_rd.at(3)], [#srs_cg.at(3)],
-    [*Gemini 3.5 Flash Lite*], [#srs_tl.at(4)], [#srs_tr.at(4)], [#srs_bf.at(4)], [#srs_rd.at(4)], [#srs_cg.at(4)],
-    [*Gemini 3.5 Flash*], [#srs_tl.at(5)], [#srs_tr.at(5)], [#srs_bf.at(5)], [#srs_rd.at(5)], [#srs_cg.at(5)],
-    [*Gemini 3.1 Pro*], [#srs_tl.at(6)], [#srs_tr.at(6)], [#srs_bf.at(6)], [#srs_rd.at(6)], [#srs_cg.at(6)],
+    [*GPT 5 Mini*], [#srs_tl.at(0)], [#srs_tr.at(0)],
+    [#srs_bf.at(0)], [#srs_rd.at(0)], [#srs_cg.at(0)],
+
+    [*GPT 5.3 Chat*], [#srs_tl.at(1)], [#srs_tr.at(1)],
+    [#srs_bf.at(1)], [#srs_rd.at(1)], [#srs_cg.at(1)],
+
+    [*Deepseek*], [#srs_tl.at(2)], [#srs_tr.at(2)],
+    [#srs_bf.at(2)], [#srs_rd.at(2)], [#srs_cg.at(2)],
+
+    [*Kimi K2*], [#srs_tl.at(3)], [#srs_tr.at(3)],
+    [#srs_bf.at(3)], [#srs_rd.at(3)], [#srs_cg.at(3)],
+
+    [*Gemini 3.1 Flash Lite*], [#srs_tl.at(4)], [#srs_tr.at(4)],
+    [#srs_bf.at(4)], [#srs_rd.at(4)], [#srs_cg.at(4)],
+
+    [*Gemini 3.5 Flash*], [#srs_tl.at(5)], [#srs_tr.at(5)],
+    [#srs_bf.at(5)], [#srs_rd.at(5)], [#srs_cg.at(5)],
+
+    [*Gemini 3.1 Pro*], [#srs_tl.at(6)], [#srs_tr.at(6)],
+    [#srs_bf.at(6)], [#srs_rd.at(6)], [#srs_cg.at(6)],
   ),
   caption: "Success rate per model per task"
 )<tab_succ>
@@ -232,29 +251,33 @@ The task "#s_BF" shows another increase in latency and "#s_CG" showed the highes
     [#ml_bf.at(2)], [#ml_rd.at(2)], [#ml_cg.at(2)],
 
     [*Kimi K2*], [#ml_tl.at(3)], [#ml_tr.at(3)],
-    [#ml_bf.at(3)], [#ml_rd.at(3)], [#ml_cg.at(3)],
+    [#ml_bf.at(3)], [#ml_rd.at(3)], [#underline(ml_cg.at(3))],
 
-    [*Gemini 3.5 Flash Lite*], [#ml_tl.at(4)], [#ml_tr.at(4)],
+    [*Gemini 3.1 Flash Lite*], [#ml_tl.at(4)], [#ml_tr.at(4)],
     [#ml_bf.at(4)], [#ml_rd.at(4)], [#ml_cg.at(4)],
 
-    [*Gemini 3.5 Flash*], [#ml_tl.at(5)], [#ml_tr.at(5)],
-    [#ml_bf.at(5)], [#ml_rd.at(5)], [#ml_cg.at(5)],
+    [*Gemini 3.5 Flash*], [#ml_tl.at(5)], [#underline(ml_tr.at(5))],
+    [#ml_bf.at(5)], [#underline(ml_rd.at(5))], [#ml_cg.at(5)],
 
-    [*Gemini 3.1 Pro*], [#ml_tl.at(6)], [#ml_tr.at(6)],
-    [#ml_bf.at(6)], [#ml_rd.at(6)], [#ml_cg.at(6)],
+    [*Gemini 3.1 Pro*], [#underline(ml_tl.at(6))], [#ml_tr.at(6)],
+    [#underline(ml_bf.at(6))], [#ml_rd.at(6)], [#ml_cg.at(6)],
   ),
-  caption: "Median latency per model per task"
+  caption: "Median latency per model per task. Lowest value per task is underlined."
 )<tab_lat>
 
-@fig_boxplot_turn_left visualizes the latency per model for the Task #s_TL.
-For comparison, @fig_boxplot_circle_green shows the same plot for the #s_CG task.
+@fig_boxplot_turn_left visualizes the latency per model for the Task '#s_TL'.
+The boxplot shows, that even though the Gemini models `3.5 Flash` and `3.1 Pro Preview` have the lowest latencies for that task, their variance is considerably higher than that of other models.
+For comparison, @fig_boxplot_circle_green shows the same plot for the '#s_CG' task.
+While #deepseek had one of the lowest variances in @fig_boxplot_turn_left, the opposite is the case for the '#s_CG' task.
 
 #figure(
-  image("images/boxplot_Turn_left_90.png")
+  image("images/boxplot_Turn_left_90.png"),
+  caption: [Per-model latency for the task '#s_TL'.]
 )<fig_boxplot_turn_left>
 
 #figure(
-  image("images/boxplot_Circle_green.png")
+  image("images/boxplot_Circle_green.png"),
+  caption: [Per-model latency for the task '#s_CG'.]
 )<fig_boxplot_circle_green>
 
 = Discussion
@@ -271,15 +294,25 @@ In 18/91 cases, the model did not correctly handle the distance information it w
 
 #linebreak()
 
-
 While the baseline shows that the Large Language Model itself is capable of controlling the robot satisfactorily, the results suggest that the use of relative coordinates is not suitable for navigation by unspecialized Large Language Models.
 
 == Latency
 
-@tab_lat shows that the required inference time does not scale with out perceived complexity of the tasks, but rather the required number of commands to complete the task.
+@tab_lat shows that the required inference time does not scale with our perceived complexity of the tasks, but rather the required number of commands to complete the task.
 For example, the completion of the task "#s_BF" (4 commands in optimal solution) took significantly longer than that of the "#s_RD" task (2 commands in optimal solution).
 
 Overall, the required inference time scaled relatively fast with an increasing number of output commands. Even though our benchmarking tasks were relatively simple, the task "#s_CG" required a median inference time of $14.31$ seconds.
-For more complex tasks that would require more control commands, this would likely increase even further. Even disregarding the success rate, the required latency could restrict acceptance in real life scenarios, depending on the use case.
+For more complex tasks that would require more control commands, this would likely increase even further.
+Even disregarding the subpar success rate, the required latency could restrict acceptance in real life scenarios, depending on the use case.
+This is further aggrevated by the unpredictability of the latency.
+For example, #deepseek, which had best success rate for the '#s_CG' task showed latencies ranging from $12.30$ to $25.32$ seconds. For `GPT 5 Mini`, the lowest recorded latency for that task was $8.7$ with an outlier at $33.4$ seconds.
 
-= Conclusion 
+= Conclusion
+
+Overall, the results show that the tested approach is not able to adequately solve navigation tasks that require beyond rudimentary spatial reasoning.
+While the basic controls and their sequence was no problem most of the time, all models struggled with correctly choosing the direction or extend of turn sequences.
+
+The fact that the task with the lowest success rate here was correctly solved 100% of the time with absolute coordinates, suggests that a different approach is needed for navigation in unknown environments.
+If the training and/or fine-tuning of specialized models is feasible, Vision Language Action Models @brohanRT2VisionLanguageActionModels2023 @kimOpenVLAOpenSourceVisionLanguageAction2024 @shukorSmolVLAVisionLanguageActionModel2025 might provide a more robust solution.
+
+Otherwise, approaches that provide a global representation of the discovered environment could be fused with off-the-shelf Large Language Models to provide them with global coordinates.

@@ -11,7 +11,7 @@ path = ""
 INDEX_MODEL = 0
 INDEX_TASK = 1
 
-if sys.argv[1]:
+if len(sys.argv) >= 2:
     path = sys.argv[1]
 else:
     path = "benchmark/"
@@ -30,6 +30,9 @@ def get_latencies_in_file(file: Path) -> list:
 files = Path(path).rglob("*.jsonl")
 latencies_by_model = {}
 latencies_by_task_by_model = {}
+order = ["gpt-5-mini", "gpt-5.3-chat", "DeepSeek-V3.2", "Kimi-K2.5",
+         "gemini-3.1-flash-lite", "gemini-3.5-flash", "gemini-3.1-pro-preview"]
+
 for file in files:
     parts = file.parts[1:] if file.parts[0] == "benchmark" else file.parts
     model = parts[INDEX_MODEL]
@@ -42,7 +45,7 @@ for file in files:
     else:
         by_task = latencies_by_task_by_model[task]
         # Make sure we don't have duplicates
-        assert model not in by_task
+        assert model not in by_task, f"Found multiple entries for model {model}. Expected one."
         by_task[model] = latencies
 
     if model not in latencies_by_model:
@@ -77,7 +80,7 @@ for task in tasks:
     task_name = " ".join(task.split("_"))
 
     plt.title(f"Latency per model ({task_name})")
-    sns.boxplot(data=latencies_by_task_by_model[task])
+    sns.boxplot(data=latencies_by_task_by_model[task], order=order)
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.ylabel("Latency (s)")

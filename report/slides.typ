@@ -91,20 +91,21 @@
 ]
 
 #slide(title: [Using off-the-shelf LLMs])[
-  - Typical assumptions:
-    - Perfect localization
-    - Perfect control
-]
+  - VLAs leverage LLMs to perform natural language tasks
+  - Still require specialized training and finetuning
+  - Off-the-shelf LLMs can be used #footnote("We'll show this in a minute")
+    - Assuming perfect knowledge
 
-#slide(title: [Assuming perfect localization])[
-  Insert video here using global coordinates and solving task
+  #figure(
+    image("./images/Ours.png", width: 90%)
+  )
 ]
 
 #section-slide(title: [Experiments])
 
 #slide(title: [Experiments])[
   #grid(
-    columns: (1fr, 1fr),
+    columns: (55%, 45%),
     column-gutter: 1em,
     [
       == Environment
@@ -112,20 +113,34 @@
       - Open space
       - Three colored cubes
 
+      #v(1em)
+
       #uncover("2-")[
-        == Tasks
+        ```
+        The following objects are in your vicinity:
+        - rgba(0, 1, 0, 1) cube of width 1.0,
+        height 2 and length 1.0.
+        Corner 1: 2.12 meters away at -315.01 degrees.
+        Corner 2: 2.92 meters away at -329.04 degrees.
+        Corner 3: 2.92 meters away at -300.97 degrees.
+        Corner 4: 3.54 meters away at -315.00 degrees.
+        ```
       ]
-        #uncover("3-")[1. Turn Left 90°]
-        #uncover("4-")[2. Turn Right 90°]
-        #uncover("5-")[3. Walk 3m, Turn around, come back]
-        #uncover("6-")[4. Touch the red object]
-        #uncover("7-")[5. Walk around the green object]
     ],
     [
       #figure(
         image("images/SimEnvironment.png"))
     ]
   )
+]
+
+#slide(title: [Tasks])[
+  #uncover("2-")[1. Turn Left 90°]
+  #uncover("3-")[2. Turn Right 90°]
+  #uncover("4-")[3. Walk 3m, Turn around, come back]
+  #uncover("5-")[4. Touch the red object]
+  #uncover("6-")[5. Walk around the green object]
+
 ]
 
 #slide(title: [Robot API])[
@@ -167,6 +182,19 @@
   "Gemini 3.5 Flash",
   "Gemini 3.1 Pro Preview"
 )
+
+#section-slide(title: [Baseline])
+
+#slide(title: [Baseline])[
+  *Model:* #models_pretty.last() #linebreak()
+  *Task:* Walk around the green object. #linebreak()
+  *Environment Input*:
+  ```
+  Your position is (0, 0). The following objects are in your vicinity: 
+  - rgba(0, 1, 0, 1) cube of width 1.0, height 2 and length 1.0.  Corners at positions (1.5, 1.5), (1.5, 2.5), (2.5, 1.5), (2.5, 2.5) [...]
+  ```
+  *Success Rate:* #color-ratio("20/20")
+]
 
 #section-slide(title: [Results])
 

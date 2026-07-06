@@ -188,11 +188,23 @@
 #slide(title: [Baseline])[
   *Model:* #models_pretty.last() #linebreak()
   *Task:* Walk around the green object. #linebreak()
+  #v(1em)
   *Environment Input*:
   ```
   Your position is (0, 0). The following objects are in your vicinity: 
   - rgba(0, 1, 0, 1) cube of width 1.0, height 2 and length 1.0.  Corners at positions (1.5, 1.5), (1.5, 2.5), (2.5, 1.5), (2.5, 2.5) [...]
   ```
+]
+
+#slide(title: [Baseline])[
+  #grid(
+  columns: 4, 
+  gutter: 1em,
+  image("./images/Circle Green/1.png", width: 100%),
+  image("./images/Circle Green/2.png", width: 100%),
+  image("./images/Circle Green/3.png", width: 100%),
+  image("./images/Circle Green/4.png", width: 100%),
+  )
   *Success Rate:* #color-ratio("20/20")
 ]
 
@@ -327,6 +339,30 @@
 
   )
 ]
+
+#section-slide(title: [Typical Mistakes])
+
+#slide(title: [Wrong Turns])[
+  #grid(
+    columns: 3, 
+    gutter: 1em,
+    image("./images/Turned Too Far/1.png", width: 100%),
+    image("./images/Turned Too Far/2.png", width: 100%),
+    image("./images/Turned Too Far/3.png", width: 100%),
+  )
+]
+
+#slide(title: [Collision])[
+  #grid(
+    columns: 3, 
+    gutter: 1em,
+    image("./images/Collision/1.png", width: 100%),
+    image("./images/Collision/2.png", width: 100%),
+    image("./images/Collision/3.png", width: 100%),
+  )
+]
+
+#slide(title: [Summary])
 
 #slide(title: [Bibliography])[
   #bibliography("refs.bib")

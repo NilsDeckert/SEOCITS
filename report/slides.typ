@@ -1,5 +1,8 @@
 #import "@preview/definitely-not-isec-slides:1.0.1": *
 
+#import "functions/benchmark_results.typ": *
+#import "functions/variables.typ": *
+
 #let primary_color = rgb("#C50E1F")
 
 #show: definitely-not-isec-theme.with(
@@ -143,23 +146,6 @@
   ]
 ]
 
-#let models = (
-  "GPT 5 Mini",
-  "GPT 5.3 Chat",
-  "Deepseek V3.2",
-  "Kimi K2.5",
-  "Gemini 3.1 Flash Lite",
-  "Gemini 3.5 Flash",
-  "Gemini 3.1 Pro Preview"
-)
-
-// The following variables are the short forms for the benchmarked tasks
-#let s_TL = "Turn Left"
-#let s_TR = "Turn Right"
-#let s_BF = "Walk Back and Forth"
-#let s_RD = "Touch Red"
-#let s_CG = "Circle Green"
-
 #section-slide(title: [Results])
 
 #slide(title: [Results])[
@@ -174,37 +160,37 @@
       [*#models.at(5)*],
       [*#models.at(6)*],
     [#s_TL],
-      [20/20],
-      [20/20],
-      [20/20],
-      [20/20],
-      [20/20],
-      [20/20],
-      [20/20],
+      [#srs_tl.at(0)],
+      [#srs_tl.at(1)],
+      [#srs_tl.at(2)],
+      [#srs_tl.at(3)],
+      [#srs_tl.at(4)],
+      [#srs_tl.at(5)],
+      [#srs_tl.at(6)],
     [#s_TR],
-      [20/20],
-      [20/20],
-      [20/20],
-      [20/20],
-      [20/20],
-      [20/20],
-      [20/20],
+      [#srs_tr.at(0)],
+      [#srs_tr.at(1)],
+      [#srs_tr.at(2)],
+      [#srs_tr.at(3)],
+      [#srs_tr.at(4)],
+      [#srs_tr.at(5)],
+      [#srs_tr.at(6)],
     [#s_BF],
-      [20/20],
-      [20/20],
-      [20/20],
-      [20/20],
-      [20/20],
-      [20/20],
-      [20/20],
+      [#srs_bf.at(0)],
+      [#srs_bf.at(1)],
+      [#srs_bf.at(2)],
+      [#srs_bf.at(3)],
+      [#srs_bf.at(4)],
+      [#srs_bf.at(5)],
+      [#srs_bf.at(6)],
     [#s_RD],
-      [20/20],
-      [20/20],
-      [19/20],
-      [20/20],
-      [19/20],
-      [19/20],
-      [19/20],
+      [#srs_rd.at(0)],
+      [#srs_rd.at(1)],
+      [#srs_rd.at(2)],
+      [#srs_rd.at(3)],
+      [#srs_rd.at(4)],
+      [#srs_rd.at(5)],
+      [#srs_rd.at(6)],
   )
 ]
 

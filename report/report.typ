@@ -1,5 +1,6 @@
 #import "@preview/charged-ieee:0.1.4": ieee
 #import "functions/benchmark_results.typ": *
+#import "functions/variables.typ": *
 
 #show: ieee.with(
   title: [
@@ -101,13 +102,6 @@ Because of the relatively simple nature of the tasks, the Large Language Models 
 
 == Tasks<tasks>
 
-// The following variables are the short forms for the benchmarked tasks
-#let s_TL = "Turn Left"
-#let s_TR = "Turn Right"
-#let s_BF = "Walk Back and Forth"
-#let s_RD = "Touch Red"
-#let s_CG = "Circle Green"
-
 In order to test the LLMs reasoning capabilites using relative coordinates, the model is tested on multiple tasks with approximately increasing complexity. @tab_tasks lists the benchmarked tasks.
 Tasks 1-3 are meant to ensure that the model is capable of the basic controls necessary to complete more complex tasks.
 Task 4 requires 'understanding' of the simplified sensor readings and the deduced environment.
@@ -154,19 +148,6 @@ The model is instructed to only return a combination of the given commands.
 The LLM's output is then parsed for the described commands. Recognised calls are executed, while malformed calls and comments are ignored.
 
 #linebreak()
-
-#let models_long = (
-  "GPT 5 Mini",
-  "GPT 5.3 Chat",
-  "Deepseek V3.2",
-  "Kimi K2.5",
-  "Gemini 3.1 Flash Lite",
-  "Gemini 3.5 Flash",
-  "Gemini 3.1 Pro Preview",
-)
-
-#let deepseek = `DeepSeek V3.2`
-#let kimi = `Kimi K2.5`
 
 The following Large Language Models are tested:
 

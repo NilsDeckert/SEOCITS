@@ -18,7 +18,7 @@
   config-info(
     title: [From Global Coordinates to \ Robot-Centered Representations],
     subtitle: [Assessing Spatial Reasoning in General-Purpose LLMs],
-    authors: ([*Nils Decker*]),
+    authors: ([*Nils Deckert*]),
     extra: [Seminar Operating Complex IT Systems],
     footer: [Nils Deckert],
     download-qr: "",
@@ -76,11 +76,18 @@
   - Image classification
   - Answer questions about images
   - Example: PaliGemma
+
+  #figure(
+    image("./images/VLM.png")
+  )
 ]
 
 #slide(title: [Vision Language Action Models (VLAs)])[
   - Output robot control tokens
   - Fulfil natural-language tasks
+  #figure(
+    image("./images/VLA.png")
+  )
 ]
 
 #slide(title: [Using off-the-shelf LLMs])[
@@ -151,19 +158,29 @@
   ]
 ]
 
+#let models_pretty = (
+  "GPT 5 Mini",
+  "GPT 5.3 Chat",
+  "DeepSeek V3.2",
+  "Kimi K2.5",
+  "Gemini 3.1 Flash Lite",
+  "Gemini 3.5 Flash",
+  "Gemini 3.1 Pro Preview"
+)
+
 #section-slide(title: [Results])
 
 #slide(title: [Success Rate])[
   #table(
     columns: 8,
     [*Task*],
-      [*#models.at(0)*],
-      [*#models.at(1)*],
-      [*#models.at(2)*],
-      [*#models.at(3)*],
-      [*#models.at(4)*],
-      [*#models.at(5)*],
-      [*#models.at(6)*],
+      [*#models_pretty.at(0)*],
+      [*#models_pretty.at(1)*],
+      [*#models_pretty.at(2)*],
+      [*#models_pretty.at(3)*],
+      [*#models_pretty.at(4)*],
+      [*#models_pretty.at(5)*],
+      [*#models_pretty.at(6)*],
 
     ..([#s_TL], 
        [#srs_tl.at(0)], 
@@ -218,17 +235,17 @@
   )
 ]
 
-#slide(title: [Latency])[
+#slide(title: [Median Latency])[
   #table(
     columns: 8,
     [*Task*],
-      [*#models.at(0)*],
-      [*#models.at(1)*],
-      [*#models.at(2)*],
-      [*#models.at(3)*],
-      [*#models.at(4)*],
-      [*#models.at(5)*],
-      [*#models.at(6)*],
+      [*#models_pretty.at(0)*],
+      [*#models_pretty.at(1)*],
+      [*#models_pretty.at(2)*],
+      [*#models_pretty.at(3)*],
+      [*#models_pretty.at(4)*],
+      [*#models_pretty.at(5)*],
+      [*#models_pretty.at(6)*],
 
     ..([#s_TL], 
        [#ml_tl.at(0)], 
@@ -237,7 +254,7 @@
        [#ml_tl.at(3)], 
        [#ml_tl.at(4)], 
        [#ml_tl.at(5)], 
-       [#ml_tl.at(6)]
+       [#underline(ml_tl.at(6))]
     ).map(cell => uncover("2-", cell)),
 
     ..([#s_TR], 
@@ -246,7 +263,7 @@
        [#ml_tr.at(2)], 
        [#ml_tr.at(3)], 
        [#ml_tr.at(4)], 
-       [#ml_tr.at(5)], 
+       [#underline(ml_tr.at(5))], 
        [#ml_tr.at(6)]
     ).map(cell => uncover("3-", cell)),
 
@@ -257,7 +274,7 @@
        [#ml_bf.at(3)], 
        [#ml_bf.at(4)], 
        [#ml_bf.at(5)], 
-       [#ml_bf.at(6)]
+       [#underline(ml_bf.at(6))]
     ).map(cell => uncover("4-", cell)),
 
     ..([#s_RD], 
@@ -266,7 +283,7 @@
        [#ml_rd.at(2)], 
        [#ml_rd.at(3)], 
        [#ml_rd.at(4)], 
-       [#ml_rd.at(5)], 
+       [#underline(ml_rd.at(5))], 
        [#ml_rd.at(6)]
     ).map(cell => uncover("5-", cell)),
 
@@ -274,7 +291,7 @@
        [#ml_cg.at(0)], 
        [#ml_cg.at(1)], 
        [#ml_cg.at(2)], 
-       [#ml_cg.at(3)], 
+       [#underline(ml_cg.at(3))], 
        [#ml_cg.at(4)], 
        [#ml_cg.at(5)], 
        [#ml_cg.at(6)]

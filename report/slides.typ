@@ -75,7 +75,7 @@
 #slide(title: [Vision Language Models (VLMs)])[
   - Image classification
   - Answer questions about images
-  - Example: PaliGemma
+  - Example: PaliGemma @beyerPaliGemmaVersatile3B2024
 
   #figure(
     image("./images/VLM.png")
@@ -85,6 +85,7 @@
 #slide(title: [Vision Language Action Models (VLAs)])[
   - Output robot control tokens
   - Fulfil natural-language tasks
+  - Examples: RT-2 @brohanRT2VisionLanguageActionModels2023, OpenVLA @kimOpenVLAOpenSourceVisionLanguageAction2024, SmolVLA @shukorSmolVLAVisionLanguageActionModel2025
   #figure(
     image("./images/VLA.png")
   )
@@ -94,7 +95,7 @@
   - VLAs leverage LLMs to perform natural language tasks
   - Still require specialized training and finetuning
   - Off-the-shelf LLMs can be used #footnote("We'll show this in a minute")
-    - Assuming perfect knowledge
+    - Assuming perfect knowledge #sym.arrow Global Coordinates
 
   #figure(
     image("./images/Ours.png", width: 90%)
@@ -103,12 +104,11 @@
 
 #section-slide(title: [Experiments])
 
-#slide(title: [Experiments])[
+#slide(title: [Environment])[
   #grid(
     columns: (55%, 45%),
     column-gutter: 1em,
     [
-      == Environment
       - PyBullet Simulation
       - Open space
       - Three colored cubes
@@ -135,12 +135,28 @@
 ]
 
 #slide(title: [Tasks])[
-  #uncover("2-")[1. Turn Left 90°]
-  #uncover("3-")[2. Turn Right 90°]
-  #uncover("4-")[3. Walk 3m, Turn around, come back]
-  #uncover("5-")[4. Touch the red object]
-  #uncover("6-")[5. Walk around the green object]
+  #grid(
+    columns: (1fr, 1fr),
+    gutter: 2em,
 
+    // Left
+    [
+      #uncover("2-")[1. Turn Left 90°]
+      #uncover("3-")[2. Turn Right 90°]
+      #uncover("4-")[3. Walk 3m, Turn around, come back]
+      #uncover("5-")[4. Touch the red object]
+      #uncover("6-")[5. Walk around the green object]
+    ],
+    // Right
+    [
+      #only("1")[#image("./images/SimEnvironment.png")]
+      #only("2")[#image("./images/TL.png")]
+      #only("3")[#image("./images/TR.png")]
+      #only("4")[#image("./images/BF.png")]
+      #only("5")[#image("./images/RD.png")]
+      #only("6-")[#image("./images/CG.png")]
+    ]
+  )
 ]
 
 #slide(title: [Robot API])[
@@ -192,7 +208,8 @@
   *Environment Input*:
   ```
   Your position is (0, 0). The following objects are in your vicinity: 
-  - rgba(0, 1, 0, 1) cube of width 1.0, height 2 and length 1.0.  Corners at positions (1.5, 1.5), (1.5, 2.5), (2.5, 1.5), (2.5, 2.5) [...]
+  - rgba(0, 1, 0, 1) cube of width 1.0, height 2 and length 1.0.  Corners at positions (1.5, 1.5), (1.5, 2.5), (2.5, 1.5), (2.5, 2.5)
+  - [...]
   ```
 ]
 
@@ -275,7 +292,7 @@
   )
 ]
 
-#slide(title: [Median Latency])[
+#slide(title: [Median Latency (seconds)])[
   #table(
     columns: 8,
     [*Task*],
@@ -336,7 +353,6 @@
        [#ml_cg.at(5)], 
        [#ml_cg.at(6)]
     ).map(cell => uncover("6-", cell)),
-
   )
 ]
 
@@ -346,9 +362,21 @@
   #grid(
     columns: 3, 
     gutter: 1em,
-    image("./images/Turned Too Far/1.png", width: 100%),
-    image("./images/Turned Too Far/2.png", width: 100%),
-    image("./images/Turned Too Far/3.png", width: 100%),
+    uncover("2-")[
+      #figure(
+        image("./images/Turned Too Far/1.png", width: 100%)
+      )
+    ],
+    uncover("3-")[
+      #figure(
+        image("./images/Turned Too Far/2.png", width: 100%)
+      )
+    ],
+    uncover("4-")[
+      #figure(
+        image("./images/Turned Too Far/3.png", width: 100%)
+      )
+    ]
   )
 ]
 
@@ -356,13 +384,35 @@
   #grid(
     columns: 3, 
     gutter: 1em,
-    image("./images/Collision/1.png", width: 100%),
-    image("./images/Collision/2.png", width: 100%),
-    image("./images/Collision/3.png", width: 100%),
+    uncover("1-")[
+      #figure(
+        image("./images/Collision/1.png", width: 100%)
+      )
+    ],
+    uncover("2-")[
+      #figure(
+        image("./images/Collision/2.png", width: 100%)
+      )
+    ],
+    uncover("3-")[
+      #figure(
+        image("./images/Collision/3.png", width: 100%)
+      )
+    ]
   )
 ]
 
-#slide(title: [Summary])
+#slide(title: [Summary])[
+  - LLMs are able to solve navigation tasks given absolute coordinates
+  - Inadequate with only relative coordinates
+
+  #linebreak()
+
+  #sym.arrow.r.double Different approaches are needed
+    - Global environment representation
+    - Vision Language Action Models
+
+]
 
 #slide(title: [Bibliography])[
   #bibliography("refs.bib")

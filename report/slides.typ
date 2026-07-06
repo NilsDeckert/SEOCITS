@@ -1,5 +1,9 @@
 #import "@preview/definitely-not-isec-slides:1.0.1": *
 
+// Package to split slides into steps
+#import "@preview/touying:0.7.4": *
+
+// Own functions and shared variables
 #import "functions/benchmark_results.typ": *
 #import "functions/variables.typ": *
 
@@ -101,13 +105,14 @@
       - Open space
       - Three colored cubes
 
-      == Tasks
-      1. Turn Left 90°
-      2. Turn Right 90°
-      3. Walk 3m, Turn around, come back
-      4. Touch the red object
-      5. Walk around the green object
-
+      #uncover("2-")[
+        == Tasks
+      ]
+        #uncover("3-")[1. Turn Left 90°]
+        #uncover("4-")[2. Turn Right 90°]
+        #uncover("5-")[3. Walk 3m, Turn around, come back]
+        #uncover("6-")[4. Touch the red object]
+        #uncover("7-")[5. Walk around the green object]
     ],
     [
       #figure(
@@ -148,7 +153,7 @@
 
 #section-slide(title: [Results])
 
-#slide(title: [Results])[
+#slide(title: [Success Rate])[
   #table(
     columns: 8,
     [*Task*],
@@ -159,38 +164,122 @@
       [*#models.at(4)*],
       [*#models.at(5)*],
       [*#models.at(6)*],
-    [#s_TL],
-      [#srs_tl.at(0)],
-      [#srs_tl.at(1)],
-      [#srs_tl.at(2)],
-      [#srs_tl.at(3)],
-      [#srs_tl.at(4)],
-      [#srs_tl.at(5)],
-      [#srs_tl.at(6)],
-    [#s_TR],
-      [#srs_tr.at(0)],
-      [#srs_tr.at(1)],
-      [#srs_tr.at(2)],
-      [#srs_tr.at(3)],
-      [#srs_tr.at(4)],
-      [#srs_tr.at(5)],
-      [#srs_tr.at(6)],
-    [#s_BF],
-      [#srs_bf.at(0)],
-      [#srs_bf.at(1)],
-      [#srs_bf.at(2)],
-      [#srs_bf.at(3)],
-      [#srs_bf.at(4)],
-      [#srs_bf.at(5)],
-      [#srs_bf.at(6)],
-    [#s_RD],
-      [#srs_rd.at(0)],
-      [#srs_rd.at(1)],
-      [#srs_rd.at(2)],
-      [#srs_rd.at(3)],
-      [#srs_rd.at(4)],
-      [#srs_rd.at(5)],
-      [#srs_rd.at(6)],
+
+    ..([#s_TL], 
+       [#srs_tl.at(0)], 
+       [#srs_tl.at(1)], 
+       [#srs_tl.at(2)], 
+       [#srs_tl.at(3)], 
+       [#srs_tl.at(4)], 
+       [#srs_tl.at(5)], 
+       [#srs_tl.at(6)]
+    ).map(cell => uncover("2-", cell)),
+
+  ..([#s_TR], 
+     [#srs_tr.at(0)], 
+     [#srs_tr.at(1)], 
+     [#srs_tr.at(2)], 
+     [#srs_tr.at(3)], 
+     [#srs_tr.at(4)], 
+     [#srs_tr.at(5)], 
+     [#srs_tr.at(6)]
+  ).map(cell => uncover("3-", cell)),
+
+  ..([#s_BF], 
+     [#srs_bf.at(0)], 
+     [#srs_bf.at(1)], 
+     [#srs_bf.at(2)], 
+     [#srs_bf.at(3)], 
+     [#srs_bf.at(4)], 
+     [#srs_bf.at(5)], 
+     [#srs_bf.at(6)]
+  ).map(cell => uncover("4-", cell)),
+
+  ..([#s_RD], 
+     [#srs_rd.at(0)], 
+     [#srs_rd.at(1)], 
+     [#srs_rd.at(2)], 
+     [#srs_rd.at(3)], 
+     [#srs_rd.at(4)], 
+     [#srs_rd.at(5)], 
+     [#srs_rd.at(6)]
+  ).map(cell => uncover("5-", cell)),
+
+  ..([#s_CG], 
+     [#srs_cg.at(0)], 
+     [#srs_cg.at(1)], 
+     [#srs_cg.at(2)], 
+     [#srs_cg.at(3)], 
+     [#srs_cg.at(4)], 
+     [#srs_cg.at(5)], 
+     [#srs_cg.at(6)]
+  ).map(cell => uncover("6-", cell)),
+
+  )
+]
+
+#slide(title: [Latency])[
+  #table(
+    columns: 8,
+    [*Task*],
+      [*#models.at(0)*],
+      [*#models.at(1)*],
+      [*#models.at(2)*],
+      [*#models.at(3)*],
+      [*#models.at(4)*],
+      [*#models.at(5)*],
+      [*#models.at(6)*],
+
+    ..([#s_TL], 
+       [#ml_tl.at(0)], 
+       [#ml_tl.at(1)], 
+       [#ml_tl.at(2)], 
+       [#ml_tl.at(3)], 
+       [#ml_tl.at(4)], 
+       [#ml_tl.at(5)], 
+       [#ml_tl.at(6)]
+    ).map(cell => uncover("2-", cell)),
+
+    ..([#s_TR], 
+       [#ml_tr.at(0)], 
+       [#ml_tr.at(1)], 
+       [#ml_tr.at(2)], 
+       [#ml_tr.at(3)], 
+       [#ml_tr.at(4)], 
+       [#ml_tr.at(5)], 
+       [#ml_tr.at(6)]
+    ).map(cell => uncover("3-", cell)),
+
+    ..([#s_BF], 
+       [#ml_bf.at(0)], 
+       [#ml_bf.at(1)], 
+       [#ml_bf.at(2)], 
+       [#ml_bf.at(3)], 
+       [#ml_bf.at(4)], 
+       [#ml_bf.at(5)], 
+       [#ml_bf.at(6)]
+    ).map(cell => uncover("4-", cell)),
+
+    ..([#s_RD], 
+       [#ml_rd.at(0)], 
+       [#ml_rd.at(1)], 
+       [#ml_rd.at(2)], 
+       [#ml_rd.at(3)], 
+       [#ml_rd.at(4)], 
+       [#ml_rd.at(5)], 
+       [#ml_rd.at(6)]
+    ).map(cell => uncover("5-", cell)),
+
+    ..([#s_CG], 
+       [#ml_cg.at(0)], 
+       [#ml_cg.at(1)], 
+       [#ml_cg.at(2)], 
+       [#ml_cg.at(3)], 
+       [#ml_cg.at(4)], 
+       [#ml_cg.at(5)], 
+       [#ml_cg.at(6)]
+    ).map(cell => uncover("6-", cell)),
+
   )
 ]
 

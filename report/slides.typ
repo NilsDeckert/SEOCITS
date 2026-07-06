@@ -108,7 +108,7 @@
     ],
     [
       #figure(
-        image("../report/images/SimEnvironment.png"))
+        image("images/SimEnvironment.png"))
     ]
   )
 ]
@@ -209,5 +209,5 @@
 ]
 
 #slide(title: [Bibliography])[
-  #bibliography("bibliography.bib")
+  #bibliography("refs.bib")
 ]

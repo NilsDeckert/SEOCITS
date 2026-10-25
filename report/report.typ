@@ -102,7 +102,7 @@ Because of the relatively simple nature of the tasks, the Large Language Models 
 
 == Tasks<tasks>
 
-In order to test the LLMs reasoning capabilites using relative coordinates, the model is tested on multiple tasks with approximately increasing complexity. @tab_tasks lists the benchmarked tasks.
+In order to test the LLMs reasoning capabilities using relative coordinates, the model is tested on multiple tasks with approximately increasing complexity. @tab_tasks lists the benchmarked tasks.
 Tasks 1-3 are meant to ensure that the model is capable of the basic controls necessary to complete more complex tasks.
 Task 4 requires 'understanding' of the simplified sensor readings and the deduced environment.
 Finally, Task 5 combines the requirements necessary for the prior tasks and demands 'understanding' of the location changes caused by the robots movements.

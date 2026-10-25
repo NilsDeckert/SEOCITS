@@ -1,7 +1,7 @@
 # Seminar: Operating Complex IT systems
 
-The repository explores the usage of relative coordinates for a LLM controlled robot. 
-The idea is to provide a LLM with a simple api to control a robot, giving it tasks to complete in the environment.
+The repository explores the usage of relative coordinates for a LLM-controlled robot. 
+The idea is to provide a LLM with a simple api to control a robot, giving it [tasks](#experiments) to complete in the environment.
 
 See [Results](#results) to compare the performance of different models.
 For more info, read the report or skim the slides in the [release](https://github.com/NilsDeckert/SEOCITS/releases/tag/Submission).
@@ -30,6 +30,23 @@ python main.py
 ```
 
 ![A screenshot of the simulation](./report/images/simulation.png)
+
+## Experiments
+
+In order to test the LLMs reasoning capabilities using relative coordinates, the model is tested on multiple tasks with approximately increasing complexity.
+The table below lists the benchmarked tasks.
+
+Tasks 1-3 are meant to ensure that the model is capable of the basic controls necessary to complete more complex tasks.
+Task 4 requires 'understanding' of the simplified sensor readings and the deduced environment.
+Finally, Task 5 combines the requirements necessary for the prior tasks and demands 'understanding' of the location changes caused by the robots' movements.
+
+| Short |                                                                   Description                                                                   |
+|-------|:-----------------------------------------------------------------------------------------------------------------------------------------------:|
+| Turn Left |                                                              Turn left 90 degrees                                                               |
+| Turn Right |                                                              Turn right 90 degrees                                                              |
+| Walk Back and Forth | Walk 3 meters forward, then turn around and walk back to you original position. Turn around until you are facing your starting position again.  |
+| Touch Red |                                                              Touch the red circle                                                               |
+| Circle Green |                                                             Touch the green circle                                                              |
 
 ## Results
 

@@ -203,6 +203,9 @@ The two Gemini models `3.1 Flash Lite` and `3.1 Pro Preview` performed the worst
 
     [*Gemini 3.1 Pro Preview*], [#srs_tl.at(6)], [#srs_tr.at(6)],
     [#srs_bf.at(6)], [#srs_rd.at(6)], [#srs_cg.at(6)],
+
+    [*Gemini 4 Argon*], [TBD], [TBD],
+    [TBD], [TBD], [#srs_cg.at(7)],
   ),
   caption: "Success rate per model per task"
 )<tab_succ>
@@ -246,6 +249,9 @@ The task "#s_BF" shows another increase in latency, and "#s_CG" showed the highe
 
     [*Gemini 3.1 Pro Preview*], [#underline(ml_tl.at(6))], [#ml_tr.at(6)],
     [#underline(ml_bf.at(6))], [#ml_rd.at(6)], [#ml_cg.at(6)],
+
+    [*Gemini 4 Argon*], [TBD], [TBD],
+    [TBD], [TBD], [#ml_cg.at(7)],
   ),
   caption: "Median latency per model per task. Lowest value per task is underlined."
 )<tab_lat>

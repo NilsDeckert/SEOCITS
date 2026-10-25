@@ -18,10 +18,11 @@ MODELS_TO_TEST = [
     # AzureModels.GPT_5_MINI,
     # AzureModels.GPT_5_3_CHAT,
     # AzureModels.DEEPSEEK,
-    AzureModels.KIMI,
+    # AzureModels.KIMI,
     # GeminiModels.FLASH,
     # GeminiModels.LIGHT,
-    # GeminiModels.PRO
+    # GeminiModels.PRO,
+    GeminiModels.ARGON
 ]
 
 def spawn_obstacles(sim):
@@ -103,7 +104,7 @@ def main():
         for task in tasks:
 
             setup = ExperimentSetup(
-                model=AzureModels.GPT_5_3_CHAT,
+                model=model,
                 task=task.task,
                 runs=[],
             )

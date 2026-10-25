@@ -9,6 +9,7 @@ import config
 from llm.operator import Operator
 
 class GeminiModels(StrEnum):
+    ARGON = "gemini-4-argon"
     PRO = "gemini-3.1-pro-preview"
     FLASH = "gemini-3.5-flash"
     LITE = "gemini-3.1-flash-lite"

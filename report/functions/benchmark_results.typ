@@ -55,7 +55,8 @@
   "/benchmark/Kimi-K2.5/Circle_green/2026-06-06_15-04-35/summary.jsonl",
   "/benchmark/gemini-3.1-flash-lite/Circle_green/2026-06-06_15-58-42/summary.jsonl",
   "/benchmark/gemini-3.5-flash/Circle_green/2026-06-06_15-37-53/summary.jsonl",
-  "/benchmark/gemini-3.1-pro-preview/Circle_green/2026-06-06_16-31-01/summary.jsonl"
+  "/benchmark/gemini-3.1-pro-preview/Circle_green/2026-06-06_16-31-01/summary.jsonl",
+  "/benchmark/gemini-4-argon/Circle_green/2026-10-25_16-45-20/summary.jsonl"
 )
 #let srs_cg = paths_cg.map(p => get-file-metrics(p).at("success-rate"))
 #let ml_cg = paths_cg.map(p => get-file-metrics(p).at("median-latency"))

@@ -184,6 +184,7 @@
        - Gemini 3.1 Flash Lite
        - Gemini 3.5 Flash
        - Gemini 3.1 Pro Preview
+       - Gemini 4 Argon
       ]
     )
   ]
@@ -196,7 +197,8 @@
   "Kimi K2.5",
   "Gemini 3.1 Flash Lite",
   "Gemini 3.5 Flash",
-  "Gemini 3.1 Pro Preview"
+  "Gemini 3.1 Pro Preview",
+  "Gemini 4 Argon"
 )
 
 #section-slide(title: [Baseline])
@@ -229,7 +231,7 @@
 
 #slide(title: [Success Rate])[
   #table(
-    columns: 8,
+    columns: 9,
     [*Task*],
       [*#models_pretty.at(0)*],
       [*#models_pretty.at(1)*],
@@ -238,6 +240,7 @@
       [*#models_pretty.at(4)*],
       [*#models_pretty.at(5)*],
       [*#models_pretty.at(6)*],
+      [*#models_pretty.at(7)*],
 
     ..([#s_TL], 
        [#srs_tl.at(0)], 
@@ -246,7 +249,8 @@
        [#srs_tl.at(3)], 
        [#srs_tl.at(4)], 
        [#srs_tl.at(5)], 
-       [#srs_tl.at(6)]
+       [#srs_tl.at(6)],
+       "TBD"
     ).map(cell => uncover("2-", cell)),
 
   ..([#s_TR], 
@@ -256,7 +260,8 @@
      [#srs_tr.at(3)], 
      [#srs_tr.at(4)], 
      [#srs_tr.at(5)], 
-     [#srs_tr.at(6)]
+     [#srs_tr.at(6)],
+     "TBD"
   ).map(cell => uncover("3-", cell)),
 
   ..([#s_BF], 
@@ -266,7 +271,8 @@
      [#srs_bf.at(3)], 
      [#srs_bf.at(4)], 
      [#srs_bf.at(5)], 
-     [#srs_bf.at(6)]
+     [#srs_bf.at(6)],
+     "TBD"
   ).map(cell => uncover("4-", cell)),
 
   ..([#s_RD], 
@@ -276,7 +282,8 @@
      [#srs_rd.at(3)], 
      [#srs_rd.at(4)], 
      [#srs_rd.at(5)], 
-     [#srs_rd.at(6)]
+     [#srs_rd.at(6)],
+     "TBD"
   ).map(cell => uncover("5-", cell)),
 
   ..([#s_CG], 
@@ -286,7 +293,8 @@
      [#srs_cg.at(3)], 
      [#srs_cg.at(4)], 
      [#srs_cg.at(5)], 
-     [#srs_cg.at(6)]
+     [#srs_cg.at(6)],
+     [#srs_cg.at(7)]
   ).map(cell => uncover("6-", cell)),
 
   )
@@ -294,7 +302,7 @@
 
 #slide(title: [Median Latency (seconds)])[
   #table(
-    columns: 8,
+    columns: 9,
     [*Task*],
       [*#models_pretty.at(0)*],
       [*#models_pretty.at(1)*],
@@ -303,6 +311,7 @@
       [*#models_pretty.at(4)*],
       [*#models_pretty.at(5)*],
       [*#models_pretty.at(6)*],
+      [*#models_pretty.at(7)*],
 
     ..([#s_TL], 
        [#ml_tl.at(0)], 
@@ -311,7 +320,8 @@
        [#ml_tl.at(3)], 
        [#ml_tl.at(4)], 
        [#ml_tl.at(5)], 
-       [#underline(ml_tl.at(6))]
+       [#underline(ml_tl.at(6))],
+       "TBD"
     ).map(cell => uncover("2-", cell)),
 
     ..([#s_TR], 
@@ -321,7 +331,8 @@
        [#ml_tr.at(3)], 
        [#ml_tr.at(4)], 
        [#underline(ml_tr.at(5))], 
-       [#ml_tr.at(6)]
+       [#ml_tr.at(6)],
+       "TBD",
     ).map(cell => uncover("3-", cell)),
 
     ..([#s_BF], 
@@ -331,7 +342,8 @@
        [#ml_bf.at(3)], 
        [#ml_bf.at(4)], 
        [#ml_bf.at(5)], 
-       [#underline(ml_bf.at(6))]
+       [#underline(ml_bf.at(6))],
+       "TBD",
     ).map(cell => uncover("4-", cell)),
 
     ..([#s_RD], 
@@ -341,7 +353,8 @@
        [#ml_rd.at(3)], 
        [#ml_rd.at(4)], 
        [#underline(ml_rd.at(5))], 
-       [#ml_rd.at(6)]
+       [#ml_rd.at(6)],
+       "TBD",
     ).map(cell => uncover("5-", cell)),
 
     ..([#s_CG], 
@@ -351,7 +364,8 @@
        [#underline(ml_cg.at(3))], 
        [#ml_cg.at(4)], 
        [#ml_cg.at(5)], 
-       [#ml_cg.at(6)]
+       [#ml_cg.at(6)],
+       [#ml_cg.at(7)]
     ).map(cell => uncover("6-", cell)),
   )
 ]
